@@ -1,0 +1,6 @@
+__pycache__/
+.pytest_cache/
+xdem_libs/
+.vscode/
+*.xml
+algorithms/aligned_dem.tif
