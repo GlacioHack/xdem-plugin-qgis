@@ -7,7 +7,7 @@ from qgis.core import (
     QgsProcessingParameterDefinition,
     QgsProcessingParameterRasterDestination,
 )
-from .processing_tools import XdemProcessingAlgorithm, coreg_info, load_mask
+from .processing_tools import XdemProcessingAlgorithm
 
 # Dictionaries listing bias correction and coregistration methods
 
@@ -92,17 +92,13 @@ class BiasCorrection(XdemProcessingAlgorithm):
         tba_dem = xdem.DEM(tba_dem_path)
         ref_dem = xdem.DEM(ref_dem_path)
 
-        inlier_mask = load_mask(self, parameters, context, feedback)
+        inlier_mask = self.load_mask(parameters, context, feedback)
 
         # Loading the corresponding method
         coreg = BIAS_METHODS[method]
 
         coreg.fit(ref_dem, tba_dem, inlier_mask)
         aligned_dem = coreg.apply(tba_dem)
-
-        # Display the bias corrections informations in the QGIS console
-        feedback.pushInfo("Bias corrections informations:")
-        coreg_info(coreg, feedback)
 
         aligned_dem.to_file(output_path)
 
@@ -201,11 +197,9 @@ class Coregistration(XdemProcessingAlgorithm):
         tba_dem = xdem.DEM(tba_dem_path)
         ref_dem = xdem.DEM(ref_dem_path)
 
-        inlier_mask = load_mask(self, parameters, context, feedback)
+        inlier_mask = self.load_mask(parameters, context, feedback)
 
         coreg = COREG_METHODS[method]
-
-        feedback.pushInfo("Curently, Blockwise work only with Nuth and Kääb (2011).")
 
         # Configuring blockwise if a block size is specified and if Nuth and Kääb is config
         if block_size != 0 and method == "Nuth and Kääb (2011)":
@@ -220,10 +214,6 @@ class Coregistration(XdemProcessingAlgorithm):
         else:
             coreg.fit(ref_dem, tba_dem, inlier_mask)
             aligned_dem = coreg.apply(tba_dem)
-
-            # Display the coregistration informations in the QGIS console
-            feedback.pushInfo("Coregistration informations:")
-            coreg_info(coreg, feedback)
 
         aligned_dem.to_file(output_path)
 
@@ -241,7 +231,8 @@ class Coregistration(XdemProcessingAlgorithm):
     def shortHelpString(self):
         return (
             "This algorithm enables the coregistration of two DEMs by applying 3D affine transformations.\n"
-            "Affine transformations can include vertical and horizontal translations, rotations and reflections, and scalings.\n"
+            "Affine transformations can include vertical and horizontal translations, rotations and reflections, and scalings.\n" \
+            "Curently, Blockwise work only with Nuth and Kääb (2011)."
         )
 
     def createInstance(self):

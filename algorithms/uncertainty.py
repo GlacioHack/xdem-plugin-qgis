@@ -3,7 +3,7 @@ from qgis.core import (
     QgsProcessingParameterRasterLayer,
     QgsProcessingParameterRasterDestination,
 )
-from .processing_tools import XdemProcessingAlgorithm, load_mask
+from .processing_tools import XdemProcessingAlgorithm
 
 
 class Heteroscedasticity(XdemProcessingAlgorithm):
@@ -17,7 +17,7 @@ class Heteroscedasticity(XdemProcessingAlgorithm):
         Function to retrieve parameters entered in QGIS.
         :param AL_DEM: The aligned DEM.
         :param REF_DEM: The reference DEM.
-        :param MASK: The mask corresponding to the stable terrain.
+        :param MASK: The mask corresponding to the stable terrain (0 for unstable, 1 for stable).
         :param OUTPUT: The the error map.
         """
 
@@ -60,7 +60,7 @@ class Heteroscedasticity(XdemProcessingAlgorithm):
         # Creating a DEM difference object
         ddem = ref_dem - aligned_dem
 
-        stable_terrain = load_mask(self, parameters, context, feedback)
+        stable_terrain = self.load_mask(parameters, context, feedback)
 
         # Run the pipeline with slope and max curvature
         slope, max_curvature = xdem.terrain.get_terrain_attribute(
