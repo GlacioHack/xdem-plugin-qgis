@@ -23,7 +23,7 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
         return QCoreApplication.translate("Processing", string)
 
     def load_mask(self, parameters, context, feedback):
-        inlier_mask_layer = self.parameterAsLayer(parameters, "MASK", context)
+        inlier_mask_layer = self.parameterAsRasterLayer(parameters, "MASK", context)
         if inlier_mask_layer is not None:
             inlier_mask_path = inlier_mask_layer.dataProvider().dataSourceUri()
             inlier_mask = gu.Raster(inlier_mask_path, is_mask=True)
