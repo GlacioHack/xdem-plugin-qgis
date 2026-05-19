@@ -1,19 +1,22 @@
+import sys
 import pytest
 import importlib
 
 
-packages = [
-    "cerberus",
-    "matplotlib",
-    "pytest",
-    "sklearn",
-    "weasyprint",
-    "xdem",
-]
+def test_python_version():
+    assert sys.version_info >= (3, 10)
 
 
 def test_packages():
-    for package in packages:
+    required_packages = [
+        "cerberus",
+        "matplotlib",
+        "pytest",
+        "sklearn",
+        "weasyprint",
+        "xdem",
+    ]
+    for package in required_packages:
         try:
             importlib.import_module(package)
         except ImportError:
