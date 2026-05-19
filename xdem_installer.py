@@ -6,6 +6,13 @@ from pip._internal.cli.main import main as pip_main
 
 
 class XdemInstaller:
+    """
+    The xdem installer.
+    It downloads the packages and places them in the plugin folder.
+    Then it also manages the packages shared with QGIS.
+    And finally, it adds the libs folder to the path.
+    """
+
     def __init__(self):
         self.plugin_dir = os.path.dirname(__file__)
         self.libs_folder = os.path.join(self.plugin_dir, "xdem_libs")
@@ -29,6 +36,10 @@ class XdemInstaller:
         ]
 
     def check_package(self, package):
+        """
+        This function check if a specified package exist in qgis.
+        """
+
         try:
             importlib.import_module(package)
             return True
@@ -40,6 +51,11 @@ class XdemInstaller:
             pip_main(["install", "--target", self.libs_folder, package])
 
     def clean_shared_packages(self):
+        """
+        This function clean the libs folder by removing the packages already present in qgis.
+        It avoids version conflicts.
+        """
+
         for xdem_package in os.listdir(self.libs_folder):
             for shared_package in self.shared_packages:
                 if self.check_package(shared_package):
@@ -48,6 +64,10 @@ class XdemInstaller:
                         shutil.rmtree(target_package)
 
     def install(self):
+        """
+        This function check if xdem is already installed, if not it proceed with the install.
+        """
+
         if self.check_package("xdem"):
             return True
         else:
