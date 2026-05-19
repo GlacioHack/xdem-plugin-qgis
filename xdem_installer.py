@@ -59,8 +59,4 @@ class XdemInstaller:
             if self.libs_folder not in sys.path:
                 sys.path.insert(0, self.libs_folder)
 
-            if self.check_package("xdem"):
-                return True
-
-            else:
-                return False
+            return self.check_package("xdem")
