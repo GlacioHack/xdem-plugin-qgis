@@ -3,17 +3,18 @@ This guide provide the detailed documentation for developers.
 
 ## Project structure
 ```
-├── algorithms
+xdem-plugin-qgis/
+├── algorithms/
 │   ├── corrections.py
 │   ├── processing_tools.py
 │   ├── terrain_attributes.py
 │   ├── uncertainty.py
 │   ├── workflows.py
-├── doc
+├── doc/
 │   ├──dev_guide.md
-├── img
+├── img/
 │   ├──xdem_logo.svg
-├── tests
+├── tests/
 │   ├── conftest.py
 │   ├── test_env.py
 │   ├── test_processing.py

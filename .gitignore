@@ -1,6 +1,8 @@
-__pycache__/
-.pytest_cache/
-xdem_libs/
 .vscode/
+.pytest_cache/
+__pycache__/
+xdem_libs/
+tests/Longyearbyen/
+
 *.xml
 algorithms/aligned_dem.tif

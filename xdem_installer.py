@@ -3,97 +3,80 @@ import sys
 import shutil
 import importlib
 from pip._internal.cli.main import main as pip_main
-from qgis.core import Qgis
-from qgis.utils import iface
-
-# Path Configuration
-PLUGIN_DIR = os.path.dirname(__file__)
-LIBS_FOLDER_NAME = "xdem_libs"
-LIBS_DIR = os.path.join(PLUGIN_DIR, LIBS_FOLDER_NAME)
-
-# Packages Configuration
-REQUIRED_PACKAGES = [
-    "cerberus",
-    "matplotlib",
-    "pytest",
-    "scikit-learn",
-    "weasyprint",
-    "xdem",
-]
-SHARED_PACKAGES = ["geopandas", "numpy", "pandas", "pyproj", "rasterio", "shapely"]
 
 
-def exist_in_qgis(package):
+class XdemInstaller:
     """
-    Function that checks if a package is present in QGIS by attempting to import it.
+    The xdem installer.
+    It downloads the packages and places them in the plugin folder.
+    Then it also manages the packages shared with QGIS.
+    And finally, it adds the libs folder to the path.
     """
 
-    try:
-        importlib.import_module(package)
-        return True
-    except ImportError:
-        return False
+    def __init__(self):
+        self.plugin_dir = os.path.dirname(__file__)
+        self.libs_folder = os.path.join(self.plugin_dir, "xdem_libs")
 
+        self.required_packages = [
+            "cerberus",
+            "matplotlib",
+            "pytest",
+            "scikit-learn",
+            "weasyprint",
+            "xdem",
+        ]
 
-def clean_shared_packages():
-    """
-    Function that removes shared packages if they exist in QGIS.
-    """
+        self.shared_packages = [
+            "geopandas",
+            "numpy",
+            "pandas",
+            "pyproj",
+            "rasterio",
+            "shapely",
+        ]
 
-    for xdem_package in os.listdir(LIBS_DIR):
-        for shared_package in SHARED_PACKAGES:
-            if exist_in_qgis(shared_package):
-                if xdem_package == shared_package or xdem_package.startswith(
-                    shared_package
-                ):
-                    target_package = os.path.join(LIBS_DIR, xdem_package)
-                    shutil.rmtree(target_package)
+    def check_package(self, package):
+        """
+        This function check if a specified package exist in qgis.
+        """
 
+        try:
+            importlib.import_module(package)
+            return True
+        except ImportError:
+            return False
 
-def install_package():
-    """
-    Function that installs packages in the plugin directory.
-    """
+    def install_packages(self):
+        for package in self.required_packages:
+            pip_main(["install", "--target", self.libs_folder, package])
 
-    for package in REQUIRED_PACKAGES:
-        pip_main(["install", "--target", LIBS_DIR, package])
-    iface.messageBar().pushMessage(
-        "xDEM dependencies successfully installed", level=Qgis.Info
-    )
+    def clean_shared_packages(self):
+        """
+        This function clean the libs folder by removing the packages already present in qgis.
+        It avoids version conflicts.
+        """
 
+        for xdem_package in os.listdir(self.libs_folder):
+            for shared_package in self.shared_packages:
+                if self.check_package(shared_package):
+                    if xdem_package.startswith(shared_package):
+                        target_package = os.path.join(self.libs_folder, xdem_package)
+                        shutil.rmtree(target_package)
 
-def check_xdem():
-    """
-    Function that checks if xdem is present, if not, it proceeds with the installation.
-    """
+    def install(self):
+        """
+        This function check if xdem is already installed, if not it proceed with the install.
+        """
 
-    try:
-        import xdem
+        if self.check_package("xdem"):
+            return True
+        else:
+            if not os.path.isdir(self.libs_folder):
+                os.makedirs(self.libs_folder, exist_ok=True)
+                self.install_packages()
+                self.clean_shared_packages()
 
-        return xdem
-    except ImportError:
-        pass
+            if self.libs_folder not in sys.path:
+                sys.path.insert(0, self.libs_folder)
 
-    if not os.path.isdir(LIBS_DIR):
-        os.makedirs(LIBS_DIR, exist_ok=True)
-        install_package()
-
-    clean_shared_packages()
-
-    if LIBS_DIR not in sys.path:
-        sys.path.insert(0, LIBS_DIR)
-
-    try:
-        import xdem
-
-        return xdem
-    except ImportError:
-        iface.messageBar().pushMessage(
-            "xDEM dependencies could not be installed", level=Qgis.Critical
-        )
-        shutil.rmtree(LIBS_DIR)
-        return None
-
-
-# xDEM install variable
-xdem_package = check_xdem()
+            return self.check_package("xdem")

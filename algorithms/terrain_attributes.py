@@ -10,7 +10,7 @@ from qgis.core import (
     QgsProcessingParameterFolderDestination,
 )
 from xdem.terrain import available_attributes
-from .processing_tools import XdemProcessingAlgorithm, dem_info
+from .processing_tools import XdemProcessingAlgorithm
 
 
 class TerrainAttributes(XdemProcessingAlgorithm):
@@ -45,10 +45,6 @@ class TerrainAttributes(XdemProcessingAlgorithm):
         output_path = self.parameterAsOutputLayer(parameters, "OUTPUT", context)
 
         dem = xdem.DEM(dem_path)
-
-        # Display DEM informations in the QGIS console
-        feedback.pushInfo("DEM informations:")
-        dem_info(dem, feedback)
 
         # Calling the attribute get function with its parameters
         function_with_parameters = self.get_attribute_and_parameters(
@@ -473,10 +469,6 @@ class GetTerrainAttributes(XdemProcessingAlgorithm):
         dem_path = dem_layer.dataProvider().dataSourceUri()
 
         dem = xdem.DEM(dem_path)
-
-        # Display DEM informations in the QGIS console
-        feedback.pushInfo("DEM informations:")
-        dem_info(dem, feedback)
 
         output_folder = self.parameterAsString(parameters, "OUTPUT", context)
         os.makedirs(output_folder, exist_ok=True)
