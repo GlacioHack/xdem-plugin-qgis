@@ -1,9 +1,8 @@
 from qgis.core import Qgis
+from .xdem_installer import XdemInstaller
 
 
 def classFactory(iface):
-    from .xdem_installer import XdemInstaller
-
     installer = XdemInstaller()
     if installer.install():
         iface.messageBar().pushMessage(
