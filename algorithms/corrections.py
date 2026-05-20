@@ -231,7 +231,7 @@ class Coregistration(XdemProcessingAlgorithm):
     def shortHelpString(self):
         return (
             "This algorithm enables the coregistration of two DEMs by applying 3D affine transformations.\n"
-            "Affine transformations can include vertical and horizontal translations, rotations and reflections, and scalings.\n" \
+            "Affine transformations can include vertical and horizontal translations, rotations and reflections, and scalings.\n"
             "Curently, Blockwise work only with Nuth and Kääb (2011)."
         )
 
