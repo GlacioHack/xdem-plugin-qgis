@@ -1,13 +1,15 @@
 import os
-from xdem.workflows import Accuracy, Topo
-from xdem.workflows.schemas import STATS_METHODS, TERRAIN_ATTRIBUTES, COREG_METHODS
-from qgis.utils import iface
+
 from qgis.core import (
-    QgsProcessingParameterRasterLayer,
-    QgsProcessingParameterEnum,
     QgsProcessingParameterDefinition,
+    QgsProcessingParameterEnum,
     QgsProcessingParameterFolderDestination,
+    QgsProcessingParameterRasterLayer,
 )
+from qgis.utils import iface
+from xdem.workflows import Accuracy, Topo
+from xdem.workflows.schemas import COREG_METHODS, STATS_METHODS, TERRAIN_ATTRIBUTES
+
 from .processing_tools import XdemProcessingAlgorithm
 
 COREG_METHODS = COREG_METHODS[:-1]  # Squeeze the last value (None)

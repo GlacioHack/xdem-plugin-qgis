@@ -1,8 +1,9 @@
 import xdem
 from qgis.core import (
-    QgsProcessingParameterRasterLayer,
     QgsProcessingParameterRasterDestination,
+    QgsProcessingParameterRasterLayer,
 )
+
 from .processing_tools import XdemProcessingAlgorithm
 
 

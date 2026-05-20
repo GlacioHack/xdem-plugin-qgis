@@ -1,15 +1,17 @@
 import os
+
 import xdem
-from qgis.utils import iface
 from qgis.core import (
-    QgsProcessingParameterRasterLayer,
-    QgsProcessingParameterEnum,
-    QgsProcessingParameterNumber,
     QgsProcessingParameterDefinition,
-    QgsProcessingParameterRasterDestination,
+    QgsProcessingParameterEnum,
     QgsProcessingParameterFolderDestination,
+    QgsProcessingParameterNumber,
+    QgsProcessingParameterRasterDestination,
+    QgsProcessingParameterRasterLayer,
 )
+from qgis.utils import iface
 from xdem.terrain import available_attributes
+
 from .processing_tools import XdemProcessingAlgorithm
 
 

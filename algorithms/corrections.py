@@ -1,12 +1,14 @@
 import os
+
 import xdem
 from qgis.core import (
-    QgsProcessingParameterRasterLayer,
+    QgsProcessingParameterDefinition,
     QgsProcessingParameterEnum,
     QgsProcessingParameterNumber,
-    QgsProcessingParameterDefinition,
     QgsProcessingParameterRasterDestination,
+    QgsProcessingParameterRasterLayer,
 )
+
 from .processing_tools import XdemProcessingAlgorithm
 
 # Dictionaries listing bias correction and coregistration methods
