@@ -1,7 +1,8 @@
-import os
-import sys
-import shutil
 import importlib
+import os
+import shutil
+import sys
+
 from pip._internal.cli.main import main as pip_main
 
 
@@ -35,7 +36,19 @@ class XdemInstaller:
             "shapely",
         ]
 
-    def check_package(self, package):
+    def get_python_version(self):
+        """
+        This function return the major and minor python version.
+        """
+
+        major_version = sys.version_info.major
+        minor_version = sys.version_info.minor
+
+        version = [major_version, minor_version]
+
+        return version
+
+    def exist_in_qgis(self, package):
         """
         This function check if a specified package exist in qgis.
         """
@@ -58,7 +71,7 @@ class XdemInstaller:
 
         for xdem_package in os.listdir(self.libs_folder):
             for shared_package in self.shared_packages:
-                if self.check_package(shared_package):
+                if self.exist_in_qgis(shared_package):
                     if xdem_package.startswith(shared_package):
                         target_package = os.path.join(self.libs_folder, xdem_package)
                         shutil.rmtree(target_package)
@@ -68,9 +81,15 @@ class XdemInstaller:
         This function check if xdem is already installed, if not it proceed with the install.
         """
 
-        if self.check_package("xdem"):
+        if self.exist_in_qgis("xdem"):
             return True
         else:
+            if not self.get_python_version() >= [3, 10]:
+                raise Exception(
+                    "Python version lower than 3.10, unable to install xdem"
+                )
+            else:
+                pass
             if not os.path.isdir(self.libs_folder):
                 os.makedirs(self.libs_folder, exist_ok=True)
                 self.install_packages()
@@ -79,4 +98,4 @@ class XdemInstaller:
             if self.libs_folder not in sys.path:
                 sys.path.insert(0, self.libs_folder)
 
-            return self.check_package("xdem")
+            return self.exist_in_qgis("xdem")

@@ -1,4 +1,5 @@
 from qgis.core import Qgis
+
 from .xdem_installer import XdemInstaller
 
 
@@ -12,6 +13,4 @@ def classFactory(iface):
 
         return XdemPlugin()
     else:
-        iface.messageBar().pushMessage(
-            "xDEM dependencies could not be loaded", level=Qgis.Critical
-        )
+        raise Exception("xDEM dependencies could not be loaded")
