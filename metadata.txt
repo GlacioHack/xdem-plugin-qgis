@@ -7,7 +7,7 @@ about=
     Python dependencies get installed automatically during the first start, it will take a few minutes, do not force QGIS to close.
 
 version=0.2.3
-qgisMinimumVersion=3.0
+qgisMinimumVersion=3.3
 qgisMaximumVersion=4.2
 
 author=CNES
