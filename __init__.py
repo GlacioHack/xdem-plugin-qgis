@@ -1,5 +1,4 @@
 # Initialisation script
-from qgis.core import Qgis
 
 
 def classFactory(iface):
@@ -8,8 +7,11 @@ def classFactory(iface):
     installer = XdemInstaller()
 
     if installer.run():
-        iface.messageBar().pushMessage("xDEM loaded", level=Qgis.Info)
-
         from .xdem_plugin import XdemPlugin
 
         return XdemPlugin()
+
+    else:
+        raise Exception(
+            "Unable to load the plugin, please check the logs, section 'xDEM'"
+        )
