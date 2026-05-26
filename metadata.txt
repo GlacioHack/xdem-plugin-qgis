@@ -12,9 +12,9 @@ qgisMaximumVersion=4.2
 
 author=CNES
 email=/
-license=/
-tracker=/
+license=Apache2.0
+tracker=https://github.com/GlacioHack/xdem-plugin-qgis/issues
 repository=https://github.com/GlacioHack/xdem-plugin-qgis.git
-homepage=/
+homepage=https://xdem.readthedocs.io/en/stable/index.html
 
 icon=img/xdem_logo.svg
