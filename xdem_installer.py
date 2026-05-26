@@ -57,6 +57,18 @@ class XdemInstaller:
             "shapely",
         ]
 
+    def info_log(self, message):
+        """
+        Displays information in the QGIS console, in the xDEM section.
+        """
+        QgsMessageLog.logMessage(message, tag="xDEM", level=Qgis.MessageLevel.Info)
+
+    def error_log(self, message):
+        """
+        Displays error in the QGIS console, in the xDEM section.
+        """
+        QgsMessageLog.logMessage(message, tag="xDEM", level=Qgis.MessageLevel.Critical)
+
     def exist_in_qgis(self, package):
         """
         Check if a specified package exist in qgis.
@@ -113,11 +125,7 @@ class XdemInstaller:
         """
         # Python check, xdem works starting with version 3.10
         if sys.version_info < (3, 10):
-            QgsMessageLog.logMessage(
-                "Unable to proceed with the installation, python version lower than 3.10",
-                tag="xDEM",
-                level=Qgis.MessageLevel.Critical,
-            )
+            self.error_log("Installation failled, python version lower than 3.10")
             return False
 
         # Installing packages and managing conflicts
@@ -128,11 +136,7 @@ class XdemInstaller:
                 self.clean_shared_packages()
             except Exception as e:
                 shutil.rmtree(self.libs_folder)
-                QgsMessageLog.logMessage(
-                    f"Unable to install xdem, error:{e}",
-                    tag="xDEM",
-                    level=Qgis.MessageLevel.Critical,
-                )
+                self.error_log(f"Unable to install xdem, error:{e}")
                 return False
 
         # Add libs folder to the python path as the first entry
@@ -141,23 +145,13 @@ class XdemInstaller:
 
         if not self.exist_in_qgis("xdem"):
             shutil.rmtree(self.libs_folder)
-            QgsMessageLog.logMessage(
-                "Unable to import xdem after installation",
-                tag="xDEM",
-                level=Qgis.MessageLevel.Critical,
-            )
+            self.error_log("Unable to import xdem after installation")
             return False
 
         if not self.check_dependencies():
             shutil.rmtree(self.libs_folder)
-            QgsMessageLog.logMessage(
-                "Unable to install xdem, requirements are not satisfied",
-                tag="xDEM",
-                level=Qgis.MessageLevel.Critical,
-            )
+            self.error_log("Unable to install xdem, requirements are not satisfie")
             return False
 
-        QgsMessageLog.logMessage(
-            "xdem succesfully loaded", tag="xDEM", level=Qgis.MessageLevel.Info
-        )
+        self.info_log("xdem succesfully loaded")
         return True
