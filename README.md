@@ -9,7 +9,7 @@ For now, use `git clone` for installation, here are the steps:
 3. Restart QGIS.
 4. Open the plugins menu and check the box to enable xDEM.
 
-It will take a few minutes for the dependencies to install properly, do not force QGIS to close. A message confirming successful installation should appear.
+It will take a few minutes for the dependencies to install properly, do not force QGIS to close.
 
 ## Available processing
 All the algorithms can be accessed through the QGIS Processing Toolbox in `xDEM`, they are organized into four sections.
