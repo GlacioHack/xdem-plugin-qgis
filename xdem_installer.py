@@ -1,14 +1,33 @@
+# Copyright (c) 2026 xDEM developers
+#
+# This file is part of the xDEM project:
+# https://github.com/glaciohack/xdem
+# https://github.com/GlacioHack/xdem-plugin-qgis
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+#
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
 import importlib
 import importlib.metadata
 import os
 import shutil
-import subprocess
 import sys
 
 import requests
 from packaging.requirements import Requirement
+from pip._internal.cli.main import main as pip_main
 from qgis.core import Qgis, QgsMessageLog
-from requests.exceptions import RequestException
 
 
 class XdemInstaller:
@@ -18,7 +37,7 @@ class XdemInstaller:
 
     def __init__(self):
         self.plugin_dir = os.path.dirname(__file__)
-        self.libs_folder = os.path.join(self.plugin_dir, "xdem_libs")
+        self.libs_folder = os.path.join(self.plugin_dir, "xdem_dependencies")
 
         self.required_packages = [
             "cerberus",
@@ -53,17 +72,7 @@ class XdemInstaller:
         Install xdem and its dependencies in the libs folder.
         """
         for package in self.required_packages:
-            subprocess.run(
-                [
-                    sys.executable,
-                    "-m",
-                    "pip",
-                    "install",
-                    "--target",
-                    self.libs_folder,
-                    package,
-                ]
-            )
+            pip_main(["install", "--target", self.libs_folder, package])
 
     def clean_shared_packages(self):
         """
@@ -80,31 +89,22 @@ class XdemInstaller:
         """
         Download the xdem requirements file.
         """
-        try:
-            url = "https://raw.githubusercontent.com/GlacioHack/xdem/main/requirements.txt"
-            requirements = requests.get(url).text
-            return requirements
-        except RequestException:
-            QgsMessageLog.logMessage(
-                "Request failled, unable to check xdem requirements",
-                tag="xDEM",
-                level=Qgis.MessageLevel.Warning,
-            )
-            return None
+        url = "https://raw.githubusercontent.com/GlacioHack/xdem/main/requirements.txt"
+        requirements = requests.get(url).text
+        return requirements
 
-    def check_dependencies(self, requirements):
+    def check_dependencies(self):
         """
         Check if the environment satisfies the requirements.
         """
-        if requirements:
-            for line in requirements.splitlines():
-                if not line or line.startswith("#"):
-                    continue
-                req = Requirement(line)
-                installed_version = importlib.metadata.version(req.name)
-                if installed_version not in req.specifier:
-                    return False
-            return True
+        requirements = self.download_requirements()
+        for line in requirements.splitlines():
+            if not line or line.startswith("#"):
+                continue
+            req = Requirement(line)
+            installed_version = importlib.metadata.version(req.name)
+            if installed_version not in req.specifier:
+                return False
         return True
 
     def run(self):
@@ -148,7 +148,7 @@ class XdemInstaller:
             )
             return False
 
-        if not self.check_dependencies(self.download_requirements()):
+        if not self.check_dependencies():
             shutil.rmtree(self.libs_folder)
             QgsMessageLog.logMessage(
                 "Unable to install xdem, requirements are not satisfied",
@@ -158,6 +158,6 @@ class XdemInstaller:
             return False
 
         QgsMessageLog.logMessage(
-            "xdem loaded", tag="xDEM", level=Qgis.MessageLevel.Info
+            "xdem succesfully loaded", tag="xDEM", level=Qgis.MessageLevel.Info
         )
         return True
