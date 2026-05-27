@@ -1,17 +1,35 @@
-from qgis.core import Qgis
-from .xdem_installer import XdemInstaller
+# Copyright (c) 2026 xDEM developers
+#
+# This file is part of the xDEM project:
+# https://github.com/glaciohack/xdem
+# https://github.com/GlacioHack/xdem-plugin-qgis
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+#
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 
 def classFactory(iface):
+
+    # Initialization, verification of the installation before starting the plugin
+
+    from .xdem_installer import XdemInstaller
+
     installer = XdemInstaller()
-    if installer.install():
-        iface.messageBar().pushMessage(
-            "xDEM dependencies successfully loaded", level=Qgis.Info
-        )
+
+    if installer.run():
         from .xdem_plugin import XdemPlugin
 
         return XdemPlugin()
+
     else:
-        iface.messageBar().pushMessage(
-            "xDEM dependencies could not be loaded", level=Qgis.Critical
-        )
+        raise Exception("Unable to load the xDEM plugin, check the logs")

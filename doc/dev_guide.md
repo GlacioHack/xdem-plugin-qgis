@@ -35,7 +35,7 @@ For developers, use `git clone` for installation, here are the steps:
 3. Restart QGIS.
 4. Open the plugins menu and check the box to enable xDEM.
 
-It will take a few minutes for the dependencies to install properly, do not force QGIS to close. A message confirming successful installation should appear.
+It will take a few minutes for the dependencies to install properly, do not force QGIS to close.
 
 A plugin that will be very helpful during development is [Plugin Reloader](https://plugins.qgis.org/plugins/plugin_reloader/). By default, when changes are made to the plugin code, QGIS must be restarted. This extension allows plugins to be refreshed without closing the software.
 
@@ -52,12 +52,15 @@ The tests will run just like a standard pytest execution, with progress updates 
 
 ## Process algorithms
 Processing methods are divided into four categories, it's all in the `algorithms` folder.
+- **corrections**
+- **terrain attributes**
+- **uncertainty**
+- **workflows**
+
 
 Before getting into the logic behind xDEM processing, it is important to understand how QGIS process algorithms works.
 
-Every processing must inherit from the class `QgsProcessingAlgorithm`, it is the main processing class.
-
-The two most important methods are:
+Every processing must inherit from the class `QgsProcessingAlgorithm`, it is the main processing class. The two most important methods are:
 1. `initAlgorithm()` this method initialize the GUI, it explicitly specifies which parameters need to be entered for the algorithm to work.
 2. `processAlgorithm()` this method retrieves the parameters provided by the user and runs the process.
 

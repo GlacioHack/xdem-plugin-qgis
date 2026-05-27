@@ -1,7 +1,7 @@
 .vscode/
 .pytest_cache/
 __pycache__/
-xdem_libs/
+xdem_dependencies/
 tests/Longyearbyen/
 
 *.xml
