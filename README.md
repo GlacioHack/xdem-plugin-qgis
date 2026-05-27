@@ -19,5 +19,5 @@ All the algorithms can be accessed through the QGIS Processing Toolbox in `xDEM`
 - **Workflows**: To run full pipelines and generate detailed reports.
 
 ## Documentation
-- [xDEM package](https://xdem.readthedocs.io/en/stable/index.html)
+- [xDEM](https://xdem.readthedocs.io/en/stable/index.html)
 - [Developer guide](doc/dev_guide.md)
