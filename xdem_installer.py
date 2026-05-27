@@ -37,7 +37,7 @@ class XdemInstaller:
 
     def __init__(self):
         self.plugin_dir = os.path.dirname(__file__)
-        self.libs_folder = os.path.join(self.plugin_dir, "xdem_dependencies")
+        self.deps_dir = os.path.join(self.plugin_dir, "xdem_dependencies")
 
         self.required_packages = [
             "cerberus",
@@ -57,15 +57,13 @@ class XdemInstaller:
             "shapely",
         ]
 
-    def log(self, message, error=True):
+    def log(self, message, critical=False):
         """
         Displays information in the QGIS console, in the xDEM section.
         """
-        if error:
+        level = Qgis.MessageLevel.Info
+        if critical:
             level = Qgis.MessageLevel.Critical
-        else:
-            level = Qgis.MessageLevel.Info
-
         QgsMessageLog.logMessage(message, "xDEM", level)
 
     def exist_in_qgis(self, package):
@@ -80,20 +78,20 @@ class XdemInstaller:
 
     def install_packages(self):
         """
-        Install xdem and its dependencies in the libs folder.
+        Install xdem and its dependencies in the dependencies folder.
         """
         for package in self.required_packages:
-            pip_main(["install", "--target", self.libs_folder, package])
+            pip_main(["install", "--target", self.deps_dir, package])
 
     def clean_shared_packages(self):
         """
         Clean the libs folder by removing the packages already present in qgis.
         """
-        for xdem_package in os.listdir(self.libs_folder):
+        for xdem_package in os.listdir(self.deps_dir):
             for shared_package in self.shared_packages:
                 if self.exist_in_qgis(shared_package):
                     if xdem_package.startswith(shared_package):
-                        target_package = os.path.join(self.libs_folder, xdem_package)
+                        target_package = os.path.join(self.deps_dir, xdem_package)
                         shutil.rmtree(target_package)
 
     def download_requirements(self):
@@ -124,33 +122,37 @@ class XdemInstaller:
         """
         # Python check, xdem works starting with version 3.10
         if sys.version_info < (3, 10):
-            self.log("Installation failled, python version lower than 3.10")
+            self.log(
+                "Installation failed, python version lower than 3.10", critical=True
+            )
             return False
 
         # Installing packages and managing conflicts
-        if not os.path.isdir(self.libs_folder):
+        if not os.path.isdir(self.deps_dir):
             try:
-                os.makedirs(self.libs_folder, exist_ok=True)
+                os.makedirs(self.deps_dir, exist_ok=True)
                 self.install_packages()
                 self.clean_shared_packages()
             except Exception as e:
-                shutil.rmtree(self.libs_folder)
-                self.log(f"Unable to install xdem, error:{e}")
+                shutil.rmtree(self.deps_dir)
+                self.log(f"Installation failed, error:{e}", critical=True)
                 return False
 
         # Add libs folder to the python path as the first entry
-        if self.libs_folder not in sys.path:
-            sys.path.insert(0, self.libs_folder)
-
-        if not self.exist_in_qgis("xdem"):
-            shutil.rmtree(self.libs_folder)
-            self.log("Unable to import xdem after installation")
-            return False
+        if self.deps_dir not in sys.path:
+            sys.path.insert(0, self.deps_dir)
 
         if not self.check_dependencies():
-            shutil.rmtree(self.libs_folder)
-            self.log("Unable to install xdem, requirements are not satisfie")
+            shutil.rmtree(self.deps_dir)
+            self.log(
+                "Installation failed, requirements are not satisfied", critical=True
+            )
             return False
 
-        self.log("xdem succesfully loaded", error=False)
+        if not self.exist_in_qgis("xdem"):
+            shutil.rmtree(self.deps_dir)
+            self.log("Installation failed, unable to import xdem", critical=True)
+            return False
+
+        self.log("Dependencies loaded successfully")
         return True
