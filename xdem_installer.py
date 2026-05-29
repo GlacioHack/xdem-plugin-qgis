@@ -171,6 +171,8 @@ class XdemInstaller:
         # Add libs folder to the python path and initialize the proj and gdal data
         if self.deps_dir not in sys.path:
             sys.path.insert(0, self.deps_dir)
+
+        if sys.platform == "win32":
             self.set_proj_gdal_env()
 
         if not self.check_dependencies():
