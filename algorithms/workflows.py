@@ -42,8 +42,8 @@ def generate_pdf(workflow, feedback):
         HTML(workflow.outputs_folder / "report.html").write_pdf(
             workflow.outputs_folder / "report.pdf"
         )
-    except Exception:
-        feedback.pushWarning("Unable to generate pdf")
+    except Exception as e:
+        feedback.pushWarning(f"Unable to generate pdf, error: {e}")
 
 
 class AccuracyWorkflow(XdemProcessingAlgorithm):
