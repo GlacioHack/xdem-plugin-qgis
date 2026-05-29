@@ -17,6 +17,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+import os
+
+import numpy as np
 import pytest
 import xdem
 from qgis.core import QgsRasterLayer
@@ -30,7 +34,28 @@ def ref_dem_layer():
 
 
 @pytest.fixture
-def tba_dem_layer():
-    tba_dem_path = xdem.examples.get_path("longyearbyen_tba_dem")
+def tba_dem_layer(tmp_path):
+    ref_dem = xdem.DEM(xdem.examples.get_path("longyearbyen_ref_dem"))
+
+    x_shift = 30
+    y_shift = 30
+    z_shift = 10
+
+    matrix = np.array(
+        [
+            [1, 0, 0, x_shift],
+            [0, 1, 0, y_shift],
+            [0, 0, 1, z_shift],
+            [0, 0, 0, 1],
+        ]
+    )
+
+    # Applying the offset to the DEM
+    tba_dem = xdem.coreg.apply_matrix(ref_dem, matrix)
+
+    # Save the file because QgsRasterLayer take a path as input
+    tba_dem_path = os.path.join(tmp_path, "tba_dem.tif")
+    tba_dem.to_file(tba_dem_path)
+
     layer = QgsRasterLayer(tba_dem_path)
     return layer
