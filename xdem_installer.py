@@ -57,13 +57,16 @@ class XdemInstaller:
             "shapely",
         ]
 
-    def log(self, message, critical=False):
+    def log(self, message, critical=False, warning=False):
         """
         Displays information in the QGIS console, in the xDEM section.
         """
         level = Qgis.MessageLevel.Info
         if critical:
             level = Qgis.MessageLevel.Critical
+        if warning:
+            level = Qgis.MessageLevel.Warning
+
         QgsMessageLog.logMessage(message, "xDEM", level)
 
     def exist_in_qgis(self, package):
@@ -81,7 +84,16 @@ class XdemInstaller:
         Install xdem and its dependencies in the dependencies folder.
         """
         for package in self.required_packages:
-            pip_main(["install", "--target", self.deps_dir, package])
+            pip_main(
+                [
+                    "install",
+                    "--target",
+                    self.deps_dir,
+                    package,
+                    "--trusted-host",
+                    "pypi.org",
+                ]
+            )
 
     def clean_shared_packages(self):
         """
@@ -106,15 +118,33 @@ class XdemInstaller:
         """
         Check if the environment satisfies the requirements.
         """
-        requirements = self.download_requirements()
-        for line in requirements.splitlines():
-            if not line or line.startswith("#"):
-                continue
-            req = Requirement(line)
-            installed_version = importlib.metadata.version(req.name)
-            if installed_version not in req.specifier:
-                return False
-        return True
+        try:
+            requirements = self.download_requirements()
+            for line in requirements.splitlines():
+                if not line or line.startswith("#"):
+                    continue
+                req = Requirement(line)
+                installed_version = importlib.metadata.version(req.name)
+                if installed_version not in req.specifier:
+                    return False
+            return True
+        except Exception as e:
+            self.log(f"Unable to check for dependencies: {e}", warning=True)
+            return True
+
+    def set_proj_gdal_env(self):
+        """
+        Search for and force gdal and proj files.
+        """
+        for root, dirs, files in os.walk(self.deps_dir):
+            if "proj.db" in files:
+                proj_path = root
+                os.environ["PROJ_DATA"] = proj_path
+                os.environ["PATH"] = proj_path + os.pathsep + os.environ["PATH"]
+
+            if "gdal_data" in dirs:
+                gdal_path = os.path.join(root, "gdal_data")
+                os.environ["GDAL_DATA"] = gdal_path
 
     def run(self):
         """
@@ -138,9 +168,10 @@ class XdemInstaller:
                 self.log(f"Installation failed, error:{e}", critical=True)
                 return False
 
-        # Add libs folder to the python path as the first entry
+        # Add libs folder to the python path and initialize the proj and gdal data
         if self.deps_dir not in sys.path:
             sys.path.insert(0, self.deps_dir)
+            self.set_proj_gdal_env()
 
         if not self.check_dependencies():
             shutil.rmtree(self.deps_dir)

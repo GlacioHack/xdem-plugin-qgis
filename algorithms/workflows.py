@@ -35,12 +35,15 @@ from .processing_tools import XdemProcessingAlgorithm
 COREG_METHODS = COREG_METHODS[:-1]  # Squeeze the last value (None)
 
 
-def generate_pdf(workflow):
-    from weasyprint import HTML
+def generate_pdf(workflow, feedback):
+    try:
+        from weasyprint import HTML
 
-    HTML(workflow.outputs_folder / "report.html").write_pdf(
-        workflow.outputs_folder / "report.pdf"
-    )
+        HTML(workflow.outputs_folder / "report.html").write_pdf(
+            workflow.outputs_folder / "report.pdf"
+        )
+    except Exception:
+        feedback.pushWarning("Unable to generate pdf")
 
 
 class AccuracyWorkflow(XdemProcessingAlgorithm):
@@ -176,7 +179,7 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
 
         workflow = Accuracy(config)
         workflow.run()
-        generate_pdf(workflow)
+        generate_pdf(workflow, feedback)
 
         rasters_folder = os.path.join(output_folder, "rasters")
         for file in os.listdir(rasters_folder):
@@ -296,7 +299,7 @@ class TopoWorkflow(XdemProcessingAlgorithm):
 
         workflow = Topo(config)
         workflow.run()
-        generate_pdf(workflow)
+        generate_pdf(workflow, feedback)
 
         rasters_folder = os.path.join(output_folder, "rasters")
         for file in os.listdir(rasters_folder):
