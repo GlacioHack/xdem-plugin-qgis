@@ -68,8 +68,9 @@ def test_coreg(tba_dem_layer, ref_dem_layer, tmp_path):
     tba_dem_array = tba_dem_layer.as_numpy()
     output_array = output_layer.as_numpy()
 
-    # Absolute tolerance set on 40 due to a potential residual offset of 35.
-    atol = 40.0
+    # Absolute tolerance set on one pixel
+    res = ref_dem_layer.rasterUnitsPerPixelX()
+    atol = res
 
     # First, check if the tba dem does not pass the conditions
     assert not np.allclose(ref_dem_array, tba_dem_array, atol=atol)
