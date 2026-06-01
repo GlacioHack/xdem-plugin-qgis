@@ -57,13 +57,12 @@ class XdemInstaller:
             "shapely",
         ]
 
-    def log(self, message, info=True, critical=False, warning=False):
+    def log(self, message, critical=False, warning=False):
         """
         Displays information in the QGIS console, in the xDEM section.
         """
-        if info:
-            level = Qgis.MessageLevel.Info
-        elif critical:
+        level = Qgis.MessageLevel.Info
+        if critical:
             level = Qgis.MessageLevel.Critical
         elif warning:
             level = Qgis.MessageLevel.Warning
@@ -130,7 +129,7 @@ class XdemInstaller:
                     return False
             return True
         except Exception as e:
-            self.log(f"Unable to check xdem dependencies: {e}", warning=True)
+            self.log(f"Unable to check requirements: {e}", warning=True)
             return True
 
     def set_proj_gdal_env(self):
