@@ -135,18 +135,17 @@ class XdemInstaller:
 
     def set_proj_gdal_env(self):
         """
-        Search for and force xdem gdal and proj config.
+        Search for and set geoutils (rasterio) gdal and proj config.
         - proj.db is the projection database containing all CRS and transforms
         - gdal_data contains drivers (GeoTIFF, JPEG2000, etc.)
         """
         for root, dirs, files in os.walk(self.deps_dir):
-            if "proj.db" in files:
-                proj_path = root
-                os.environ["PROJ_DATA"] = proj_path
+            if "rasterio" in root:
+                if "proj.db" in files:
+                    os.environ["PROJ_DATA"] = root
 
-            if "gdal_data" in dirs:
-                gdal_path = os.path.join(root, "gdal_data")
-                os.environ["GDAL_DATA"] = gdal_path
+                if "gdal_data" in dirs:
+                    os.environ["GDAL_DATA"] = os.path.join(root, "gdal_data")
 
     def run(self):
         """
