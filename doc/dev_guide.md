@@ -16,7 +16,6 @@ xdem-plugin-qgis/
 │   ├──xdem_logo.svg
 ├── tests/
 │   ├── conftest.py
-│   ├── test_env.py
 │   ├── test_processing.py
 ├── .gitignore
 ├── README.md
@@ -56,7 +55,6 @@ Processing methods are divided into four categories, it's all in the `algorithms
 - **terrain attributes**
 - **uncertainty**
 - **workflows**
-
 
 Before getting into the logic behind xDEM processing, it is important to understand how QGIS process algorithms works.
 
