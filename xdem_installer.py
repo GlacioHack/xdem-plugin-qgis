@@ -63,9 +63,9 @@ class XdemInstaller:
         """
         if info:
             level = Qgis.MessageLevel.Info
-        if critical:
+        elif critical:
             level = Qgis.MessageLevel.Critical
-        if warning:
+        elif warning:
             level = Qgis.MessageLevel.Warning
 
         QgsMessageLog.logMessage(message, "xDEM", level)
