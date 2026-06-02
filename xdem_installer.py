@@ -40,11 +40,11 @@ class XdemInstaller:
         self.deps_dir = os.path.join(self.plugin_dir, "xdem_dependencies")
 
         self.required_packages = [
-            "cerberus",
-            "matplotlib",
-            "pytest",
-            "scikit-learn",
-            "weasyprint",
+            "cerberus",  # for worklfows
+            "matplotlib",  # for worklfows plots
+            "pytest",  # for tests
+            "scikit-learn",  # for blockwise coreg, with ransac
+            "weasyprint",  # for workflow pdf conversion
             "xdem",
         ]
 
@@ -130,7 +130,7 @@ class XdemInstaller:
             return True
         except Exception as e:
             self.log(f"Unable to check requirements: {e}", warning=True)
-            return True
+            return True  # If requirements can't be checked, return True but with a warning in the logs
 
     def set_proj_gdal_env(self):
         """
