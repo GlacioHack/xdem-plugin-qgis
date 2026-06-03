@@ -42,9 +42,8 @@ class TerrainAttributes(XdemProcessingAlgorithm):
 
     def initAlgorithm(self, config=None):
         """
-        Function to retrieve parameters entered in QGIS.
-        :param DEM: The DEM on which the calculation will be performed.
-        :param OUTPUT: The final results.
+        - param DEM: The DEM on which the calculation will be performed.
+        - param OUTPUT: The final results.
         """
 
         self.addParameter(
@@ -86,10 +85,9 @@ class TerrainAttributes(XdemProcessingAlgorithm):
 class Slope(TerrainAttributes):
     def initAlgorithm(self, config=None):
         super().initAlgorithm()
-        """
-        Call to the parent class, with the addition of parameters specific to Slope.
-        :param SURFACE_FIT: The surface fit to use.
-        :param UNIT: The unit in degrees or radians.
+        """.
+        - param SURFACE_FIT: The surface fit to use.
+        - param UNIT: The unit in degrees or radians.
         """
 
         parameter = QgsProcessingParameterEnum(
@@ -140,9 +138,8 @@ class Aspect(TerrainAttributes):
     def initAlgorithm(self, config=None):
         super().initAlgorithm()
         """
-        Call to the parent class, with the addition of parameters specific to Aspect.
-        :param SURFACE_FIT: The surface fit to use.
-        :param UNIT: The unit in degrees or radians.
+        - param SURFACE_FIT: The surface fit to use.
+        - param UNIT: The unit in degrees or radians.
         """
 
         parameter = QgsProcessingParameterEnum(
@@ -189,11 +186,10 @@ class Hillshade(TerrainAttributes):
     def initAlgorithm(self, config=None):
         super().initAlgorithm()
         """
-        Call to the parent class, with the addition of parameters specific to Hillshade.
-        :param SURFACE_FIT: The surface fit to use.
-        :param ALTITUDE: The shading altitude in degrees.
-        :param AZIMUTH: The shading azimuth in degrees.
-        :param ZFACTOR: The vertical exaggeration factor.
+        - param SURFACE_FIT: The surface fit to use.
+        - param ALTITUDE: The shading altitude in degrees.
+        - param AZIMUTH: The shading azimuth in degrees.
+        - param ZFACTOR: The vertical exaggeration factor.
         """
 
         parameter = QgsProcessingParameterEnum(
@@ -267,9 +263,8 @@ class Curvature(TerrainAttributes):
     def initAlgorithm(self, config=None):
         super().initAlgorithm()
         """
-        Call to the parent class, with the addition of parameters specific to Curvature, .
-        :param SURFACE_FIT: The surface fit to use.
-        :param CURV_METHOD: The method to use to calculate the curvature.
+        - param SURFACE_FIT: The surface fit to use.
+        - param CURV_METHOD: The method to use to calculate the curvature.
         """
 
         parameter = QgsProcessingParameterEnum(

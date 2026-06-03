@@ -57,12 +57,11 @@ class BiasCorrection(XdemProcessingAlgorithm):
 
     def initAlgorithm(self, config=None):
         """
-        Function to retrieve parameters entered in QGIS.
-        :param TBA_DEM: The DEM requiring correction.
-        :param REF_DEM: The reference DEM.
-        :param MASK: An optional inlier mask used to define reliable data points (0 for outliers, 1 for inliers)
-        :param METHOD: Specifies the bias correction method (e.g., "Deramping", "Directional biases").
-        :param OUTPUT: The aligned DEM.
+        - param TBA_DEM: The DEM requiring correction.
+        - param REF_DEM: The reference DEM.
+        - param MASK: An optional inlier mask used to define reliable data points (0 for outliers, 1 for inliers)
+        - param METHOD: Specifies the bias correction method (e.g., "Deramping", "Directional biases").
+        - param OUTPUT: The aligned DEM.
         """
 
         self.addParameter(
@@ -152,13 +151,12 @@ class Coregistration(XdemProcessingAlgorithm):
 
     def initAlgorithm(self, config=None):
         """
-        Function to retrieve parameters entered in QGIS.
-        :param TBA_DEM: The DEM requiring correction.
-        :param REF_DEM: The reference DEM.
-        :param MASK: An optional inlier mask used to define reliable data points (0 for outliers, 1 for inliers)
-        :param METHOD: Specifies the coregistration method (e.g., "Nuth and Kääb (2011)", "Iterative closest point").
-        :param BLOCKSIZE: Block size for blockwise execution.
-        :param OUTPUT: The aligned DEM.
+        - param TBA_DEM: The DEM requiring correction.
+        - param REF_DEM: The reference DEM.
+        - param MASK: An optional inlier mask used to define reliable data points (0 for outliers, 1 for inliers)
+        - param METHOD: Specifies the coregistration method (e.g., "Nuth and Kääb (2011)", "Iterative closest point").
+        - param BLOCKSIZE: Block size for blockwise execution.
+        - param OUTPUT: The aligned DEM.
         """
 
         self.addParameter(
@@ -268,9 +266,8 @@ class GapFilling(XdemProcessingAlgorithm):
 
     def initAlgorithm(self, config=None):
         """
-        Function to retrieve parameters entered in QGIS.
-        :param TBF_DEM: The DEM to be filled out.
-        :param OUTPUT: The filled DEM.
+        - param TBF_DEM: The DEM to be filled out.
+        - param OUTPUT: The filled DEM.
         """
 
         self.addParameter(
