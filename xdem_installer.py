@@ -130,7 +130,7 @@ class XdemInstaller:
             return True
         except Exception as e:
             self.log(f"Unable to check requirements: {e}", warning=True)
-            return True  # If requirements can't be checked, return True but with a warning in the logs
+            return True  # If requirements can't be checked, it return True but with a warning in the logs
 
     def set_proj_gdal_env(self):
         """
