@@ -166,7 +166,7 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
             },
             "outputs": {
                 "level": level,
-                "path": str(output_folder),
+                "path": output_folder,
             },
             "coregistration": {
                 "step_one": {"method": method1},
@@ -290,7 +290,7 @@ class TopoWorkflow(XdemProcessingAlgorithm):
                     "downsample": 1,
                 },
             },
-            "outputs": {"level": level, "path": str(output_folder)},
+            "outputs": {"level": level, "path": output_folder},
             "statistics": stats,
             "terrain_attributes": attributes,
         }
