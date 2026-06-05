@@ -27,7 +27,7 @@ from qgis.core import QgsRasterLayer
 
 
 @pytest.fixture
-def ref_dem_path(tmp_path):
+def ref_dem_path():
     ref_dem_path = xdem.examples.get_path("longyearbyen_ref_dem")
     return ref_dem_path
 
