@@ -114,3 +114,34 @@ def test_biascorr(tbc_dem_layer, ref_dem_layer, tmp_path):
 
     # Next, check if there has been an improvement
     assert np.allclose(ref_dem_array, output_array, rtol=tol)
+
+
+def test_workflow_topo(ref_dem_layer, tmp_path):
+    output_folder = os.path.join(tmp_path, "test_workflow_topo")
+
+    attributes = ["slope", "aspect", "hillshade", "profile_curvature"]
+
+    processing.run(
+        "XDEM:Topography",
+        {
+            "DEM": ref_dem_layer,
+            "ATTRIBUTES": attributes,
+            "STATS": ["min", "max", "mean", "median", "nmad"],
+            "LEVEL": "2",
+            "ADD_LAYERS": False,
+            "OUTPUT": output_folder,
+        },
+    )
+    # Check if html was generated
+    output_files = os.listdir(output_folder)
+    assert "report.html" in output_files
+
+    # Check if all raster where generated
+    raster_folder = os.path.join(output_folder, "rasters")
+
+    assert len(attributes) == len(os.listdir(raster_folder))
+
+    for raster in os.listdir(raster_folder):
+        raster_path = os.path.join(raster_folder, raster)
+        raster_layer = QgsRasterLayer(raster_path)
+        check_layer(ref_dem_layer, raster_layer)
