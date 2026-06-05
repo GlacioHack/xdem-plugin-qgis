@@ -21,6 +21,7 @@
 import os
 
 from qgis.core import (
+    QgsProcessingParameterBoolean,
     QgsProcessingParameterDefinition,
     QgsProcessingParameterEnum,
     QgsProcessingParameterFolderDestination,
@@ -82,6 +83,14 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
                 options=["1", "2"],
                 defaultValue="2",
                 usesStaticStrings=True,
+            )
+        )
+
+        self.addParameter(
+            QgsProcessingParameterBoolean(
+                name="ADD_LAYERS",
+                description="Add layers to project",
+                defaultValue=True,
             )
         )
 
@@ -168,10 +177,12 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
         workflow = Accuracy(config)
         workflow.run()
 
-        rasters_folder = os.path.join(output_folder, "rasters")
-        for file in os.listdir(rasters_folder):
-            file_path = os.path.join(rasters_folder, file)
-            iface.addRasterLayer(file_path)
+        add_layers = self.parameterAsBoolean(parameters, "ADD_LAYERS", context)
+        if add_layers:
+            rasters_folder = os.path.join(output_folder, "rasters")
+            for file in os.listdir(rasters_folder):
+                file_path = os.path.join(rasters_folder, file)
+                iface.addRasterLayer(file_path)
 
         return {}
 
@@ -247,6 +258,14 @@ class TopoWorkflow(XdemProcessingAlgorithm):
         )
 
         self.addParameter(
+            QgsProcessingParameterBoolean(
+                name="ADD_LAYERS",
+                description="Add layers to project",
+                defaultValue=True,
+            )
+        )
+
+        self.addParameter(
             QgsProcessingParameterFolderDestination(
                 name="OUTPUT", description="Topography folder"
             )
@@ -271,10 +290,6 @@ class TopoWorkflow(XdemProcessingAlgorithm):
             "inputs": {
                 "reference_elev": {
                     "path_to_elev": dem_path,
-                    "force_source_nodata": None,
-                    "from_vcrs": None,
-                    "to_vcrs": None,
-                    "path_to_mask": None,
                     "downsample": 1,
                 },
             },
@@ -286,10 +301,12 @@ class TopoWorkflow(XdemProcessingAlgorithm):
         workflow = Topo(config)
         workflow.run()
 
-        rasters_folder = os.path.join(output_folder, "rasters")
-        for file in os.listdir(rasters_folder):
-            file_path = os.path.join(rasters_folder, file)
-            iface.addRasterLayer(file_path)
+        add_layers = self.parameterAsBoolean(parameters, "ADD_LAYERS", context)
+        if add_layers:
+            rasters_folder = os.path.join(output_folder, "rasters")
+            for file in os.listdir(rasters_folder):
+                file_path = os.path.join(rasters_folder, file)
+                iface.addRasterLayer(file_path)
 
         return {}
 

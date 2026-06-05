@@ -22,6 +22,7 @@ import os
 
 import xdem
 from qgis.core import (
+    QgsProcessingParameterBoolean,
     QgsProcessingParameterDefinition,
     QgsProcessingParameterEnum,
     QgsProcessingParameterFolderDestination,
@@ -470,6 +471,14 @@ class GetTerrainAttributes(XdemProcessingAlgorithm):
         )
 
         self.addParameter(
+            QgsProcessingParameterBoolean(
+                name="ADD_LAYERS",
+                description="Add layers to project",
+                defaultValue=True,
+            )
+        )
+
+        self.addParameter(
             QgsProcessingParameterFolderDestination(
                 name="OUTPUT", description="Attributes folder"
             )
@@ -499,10 +508,12 @@ class GetTerrainAttributes(XdemProcessingAlgorithm):
             output = os.path.join(output_folder, f"{name}.tif")
             res.to_file(output)
 
-        for file in os.listdir(output_folder):
-            file_path = os.path.join(output_folder, file)
-            if file_path.endswith(".tif"):
-                iface.addRasterLayer(file_path)
+        add_layers = self.parameterAsBoolean(parameters, "ADD_LAYERS", context)
+        if add_layers:
+            for file in os.listdir(output_folder):
+                file_path = os.path.join(output_folder, file)
+                if file_path.endswith(".tif"):
+                    iface.addRasterLayer(file_path)
 
         return {}
 
