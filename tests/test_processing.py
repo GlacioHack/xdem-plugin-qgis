@@ -25,6 +25,15 @@ import processing
 from qgis.core import QgsRasterLayer
 
 
+def check_layer(ref_layer, output_layer):
+    """
+    Check if the output layer can be open in qgis and if projecttion is valid
+    """
+    assert output_layer.isValid()
+    assert ref_layer.crs() == output_layer.crs()
+    assert ref_layer.extent() == output_layer.extent()
+
+
 def test_slope(ref_dem_layer, tmp_path):
     output_path = os.path.join(tmp_path, "test_slope.tif")
 
@@ -37,9 +46,9 @@ def test_slope(ref_dem_layer, tmp_path):
             "OUTPUT": output_path,
         },
     )
-    output = QgsRasterLayer(result["OUTPUT"])
+    output_layer = QgsRasterLayer(result["OUTPUT"])
 
-    assert output.isValid()
+    check_layer(ref_dem_layer, output_layer)
 
 
 def test_coreg(tba_dem_layer, ref_dem_layer, tmp_path):
@@ -58,10 +67,7 @@ def test_coreg(tba_dem_layer, ref_dem_layer, tmp_path):
     )
     output_layer = QgsRasterLayer(result["OUTPUT"])
 
-    # Checks if layer can be open in qgis and if projection is correct
-    assert output_layer.isValid()
-    assert ref_dem_layer.crs() == output_layer.crs()
-    assert ref_dem_layer.extent() == output_layer.extent()
+    check_layer(ref_dem_layer, output_layer)
 
     # Convert layers to numpy array for more accurate testing
     ref_dem_array = ref_dem_layer.as_numpy()
@@ -69,11 +75,42 @@ def test_coreg(tba_dem_layer, ref_dem_layer, tmp_path):
     output_array = output_layer.as_numpy()
 
     # Absolute tolerance set on one pixel
-    res = ref_dem_layer.rasterUnitsPerPixelX()
-    atol = res
+    tol = ref_dem_layer.rasterUnitsPerPixelX()
 
     # First, check if the tba dem does not pass the conditions
-    assert not np.allclose(ref_dem_array, tba_dem_array, atol=atol)
+    assert not np.allclose(ref_dem_array, tba_dem_array, atol=tol)
 
     # Next, check if there has been an improvement
-    assert np.allclose(ref_dem_array, output_array, atol=atol)
+    assert np.allclose(ref_dem_array, output_array, atol=tol)
+
+
+def test_biascorr(tbc_dem_layer, ref_dem_layer, tmp_path):
+    output_path = os.path.join(tmp_path, "test_biascorr.tif")
+
+    result = processing.run(
+        "XDEM:Bias correction",
+        {
+            "TBA_DEM": tbc_dem_layer,
+            "REF_DEM": ref_dem_layer,
+            "MASK": None,
+            "METHOD": "Deramping",
+            "OUTPUT": output_path,
+        },
+    )
+    output_layer = QgsRasterLayer(result["OUTPUT"])
+
+    check_layer(ref_dem_layer, output_layer)
+
+    # Convert layers to numpy array for more accurate testing
+    ref_dem_array = ref_dem_layer.as_numpy()
+    tba_dem_array = tbc_dem_layer.as_numpy()
+    output_array = output_layer.as_numpy()
+
+    # Relative tolerance set to 10%
+    tol = 0.1
+
+    # First, check if the tba dem does not pass the conditions
+    assert not np.allclose(ref_dem_array, tba_dem_array, rtol=tol)
+
+    # Next, check if there has been an improvement
+    assert np.allclose(ref_dem_array, output_array, rtol=tol)

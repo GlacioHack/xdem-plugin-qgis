@@ -27,20 +27,26 @@ from qgis.core import QgsRasterLayer
 
 
 @pytest.fixture
-def ref_dem_layer():
+def ref_dem_path(tmp_path):
     ref_dem_path = xdem.examples.get_path("longyearbyen_ref_dem")
+    return ref_dem_path
+
+
+@pytest.fixture
+def ref_dem_layer(ref_dem_path):
     layer = QgsRasterLayer(ref_dem_path)
     return layer
 
 
 @pytest.fixture
-def tba_dem_layer(tmp_path):
-    ref_dem = xdem.DEM(xdem.examples.get_path("longyearbyen_ref_dem"))
+def tba_dem_layer(ref_dem_path, tmp_path):
+    ref_dem = xdem.DEM(ref_dem_path)
 
+    # Create a shift matrix
+    # Source: https://xdem.readthedocs.io/en/stable/coregistration.html#nuth-and-kaab-2011
     x_shift = 30
     y_shift = 30
     z_shift = 10
-
     matrix = np.array(
         [
             [1, 0, 0, x_shift],
@@ -50,7 +56,7 @@ def tba_dem_layer(tmp_path):
         ]
     )
 
-    # Applying the offset to the DEM
+    # Applying to the DEM
     tba_dem = xdem.coreg.apply_matrix(ref_dem, matrix)
 
     # Save the file because QgsRasterLayer take a path as input
@@ -58,4 +64,27 @@ def tba_dem_layer(tmp_path):
     tba_dem.to_file(tba_dem_path)
 
     layer = QgsRasterLayer(tba_dem_path)
+    return layer
+
+
+@pytest.fixture
+def tbc_dem_layer(ref_dem_path, tmp_path):
+    ref_dem = xdem.DEM(ref_dem_path)
+
+    # Create a ramp bias and add to the DEM
+    # Source: https://xdem.readthedocs.io/en/stable/biascorr.html#deramping
+    xx, yy = np.meshgrid(np.arange(0, ref_dem.shape[1]), np.arange(0, ref_dem.shape[0]))
+    cx = ref_dem.shape[1] / 2
+    cy = ref_dem.shape[0] / 2
+    synthetic_bias = 20 * ((xx - cx) ** 2 + (yy - cy) ** 2) / (cx * cy)
+    synthetic_bias -= np.median(synthetic_bias)
+
+    # Appliying to the DEM
+    tbc_dem = ref_dem + synthetic_bias
+
+    # Save the file because QgsRasterLayer take a path as input
+    tbc_dem_path = os.path.join(tmp_path, "tbc_dem.tif")
+    tbc_dem.to_file(tbc_dem_path)
+
+    layer = QgsRasterLayer(tbc_dem_path)
     return layer
