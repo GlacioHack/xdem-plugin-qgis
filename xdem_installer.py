@@ -43,8 +43,7 @@ class XdemInstaller:
             "cerberus",  # for worklfows
             "matplotlib",  # for worklfows plots
             "pytest",  # for tests
-            "scikit-learn",  # for blockwise coreg, with ransac
-            "weasyprint",  # for workflow pdf conversion
+            "scikit-learn",  # for blockwise coreg
             "xdem",
         ]
 
