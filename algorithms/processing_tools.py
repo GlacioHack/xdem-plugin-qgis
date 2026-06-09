@@ -16,13 +16,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import io
+import os
 from contextlib import redirect_stdout
 
 import geoutils as gu
 from qgis.core import QgsProcessingAlgorithm
 from qgis.PyQt.QtCore import QCoreApplication
+from qgis.PyQt.QtGui import QIcon
 
 
 # Main processing class
@@ -40,6 +41,11 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
 
     def group(self):
         return self.tr(self.groupId())
+
+    def icon(self):
+        plugin_dir = os.path.dirname(os.path.dirname(__file__))
+        icon_path = os.path.join(plugin_dir, "img", "xdem_algos_logo.png")
+        return QIcon(icon_path)
 
     def tr(self, string):
         return QCoreApplication.translate("Processing", string)

@@ -17,8 +17,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 
 from qgis.core import QgsProcessingProvider
+from qgis.PyQt.QtGui import QIcon
 
 from .algorithms.corrections import *
 from .algorithms.terrain_attributes import *
@@ -71,7 +73,9 @@ class XdemProvider(QgsProcessingProvider):
         return self.tr("xDEM")
 
     def icon(self):
-        return QgsProcessingProvider.icon(self)
+        plugin_dir = os.path.dirname(__file__)
+        icon_path = os.path.join(plugin_dir, "img", "xdem_algos_logo.png")
+        return QIcon(icon_path)
 
     def longName(self):
         return self.name()
