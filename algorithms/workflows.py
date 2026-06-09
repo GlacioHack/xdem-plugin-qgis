@@ -52,7 +52,6 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
         - param METHOD3: If needed, a third method can be used to operate as a pipeline.
         - param OUTPUT: The results folder.
         """
-
         self.addParameter(
             QgsProcessingParameterRasterLayer(
                 name="TBA_DEM", description="DEM to be aligned"
@@ -220,7 +219,6 @@ class TopoWorkflow(XdemProcessingAlgorithm):
         - param LEVEL: The level for detailed outputs.
         - param OUTPUT: The results folder.
         """
-
         self.addParameter(
             QgsProcessingParameterRasterLayer(name="DEM", description="DEM")
         )

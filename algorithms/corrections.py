@@ -63,7 +63,6 @@ class BiasCorrection(XdemProcessingAlgorithm):
         - param METHOD: Specifies the bias correction method (e.g., "Deramping", "Directional biases").
         - param OUTPUT: The aligned DEM.
         """
-
         self.addParameter(
             QgsProcessingParameterRasterLayer(
                 name="TBA_DEM", description="DEM to be aligned"
@@ -120,6 +119,7 @@ class BiasCorrection(XdemProcessingAlgorithm):
 
         coreg.fit(ref_dem, tba_dem, inlier_mask)
         aligned_dem = coreg.apply(tba_dem)
+        self.get_coreg_info(feedback, coreg)
 
         aligned_dem.to_file(output_path)
 
@@ -158,7 +158,6 @@ class Coregistration(XdemProcessingAlgorithm):
         - param BLOCKSIZE: Block size for blockwise execution.
         - param OUTPUT: The aligned DEM.
         """
-
         self.addParameter(
             QgsProcessingParameterRasterLayer(
                 name="TBA_DEM", description="DEM to be aligned"
@@ -234,6 +233,7 @@ class Coregistration(XdemProcessingAlgorithm):
         else:
             coreg.fit(ref_dem, tba_dem, inlier_mask)
             aligned_dem = coreg.apply(tba_dem)
+            self.get_coreg_info(feedback, coreg)
 
         aligned_dem.to_file(output_path)
 
@@ -269,7 +269,6 @@ class GapFilling(XdemProcessingAlgorithm):
         - param TBF_DEM: The DEM to be filled out.
         - param OUTPUT: The filled DEM.
         """
-
         self.addParameter(
             QgsProcessingParameterRasterLayer(
                 name="TBF_DEM", description="DEM to be filled"

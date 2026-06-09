@@ -46,7 +46,6 @@ class TerrainAttributes(XdemProcessingAlgorithm):
         - param DEM: The DEM on which the calculation will be performed.
         - param OUTPUT: The final results.
         """
-
         self.addParameter(
             QgsProcessingParameterRasterLayer(name="DEM", description="DEM")
         )
@@ -67,6 +66,7 @@ class TerrainAttributes(XdemProcessingAlgorithm):
         output_path = self.parameterAsOutputLayer(parameters, "OUTPUT", context)
 
         dem = xdem.DEM(dem_path)
+        self.get_dem_info(feedback, dem)
 
         # Calling the attribute get function with its parameters
         function_with_parameters = self.get_attribute_and_parameters(
@@ -90,7 +90,6 @@ class Slope(TerrainAttributes):
         - param SURFACE_FIT: The surface fit to use.
         - param UNIT: The unit in degrees or radians.
         """
-
         parameter = QgsProcessingParameterEnum(
             name="SURFACE_FIT",
             description="Surface fit",
@@ -119,7 +118,6 @@ class Slope(TerrainAttributes):
         """
         This function gets the advanced settings specific to slope and returns it with those specific settings.
         """
-
         surface_fit = self.parameterAsString(parameters, "SURFACE_FIT", context)
         degrees = (
             True
@@ -142,7 +140,6 @@ class Aspect(TerrainAttributes):
         - param SURFACE_FIT: The surface fit to use.
         - param UNIT: The unit in degrees or radians.
         """
-
         parameter = QgsProcessingParameterEnum(
             name="SURFACE_FIT",
             description="Surface fit",
@@ -192,7 +189,6 @@ class Hillshade(TerrainAttributes):
         - param AZIMUTH: The shading azimuth in degrees.
         - param ZFACTOR: The vertical exaggeration factor.
         """
-
         parameter = QgsProcessingParameterEnum(
             name="SURFACE_FIT",
             description="Surface fit",
@@ -267,7 +263,6 @@ class Curvature(TerrainAttributes):
         - param SURFACE_FIT: The surface fit to use.
         - param CURV_METHOD: The method to use to calculate the curvature.
         """
-
         parameter = QgsProcessingParameterEnum(
             name="SURFACE_FIT",
             description="Surface fit",

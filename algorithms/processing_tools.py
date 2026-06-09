@@ -17,6 +17,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import io
+from contextlib import redirect_stdout
 
 import geoutils as gu
 from qgis.core import QgsProcessingAlgorithm
@@ -42,7 +44,28 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
     def tr(self, string):
         return QCoreApplication.translate("Processing", string)
 
+    def get_dem_info(self, feedback, dem):
+        """
+        Returns information about the DEM in the logs
+        """
+        metadata = io.StringIO()
+        with redirect_stdout(metadata):
+            dem.info()
+        feedback.pushInfo(metadata.getvalue())
+
+    def get_coreg_info(self, feedback, coreg):
+        """
+        Returns information about corrections in the logs
+        """
+        metadata = io.StringIO()
+        with redirect_stdout(metadata):
+            coreg.info()
+        feedback.pushInfo(metadata.getvalue())
+
     def load_mask(self, parameters, context, feedback):
+        """
+        Returns a gu.Raster mask layer if one is provided
+        """
         inlier_mask_layer = self.parameterAsRasterLayer(parameters, "MASK", context)
         if inlier_mask_layer is not None:
             inlier_mask_path = inlier_mask_layer.dataProvider().dataSourceUri()
