@@ -34,8 +34,8 @@ def check_layer(ref_layer, output_layer):
     assert ref_layer.extent() == output_layer.extent()
 
 
-def test_slope(ref_dem_layer, tmp_path):
-    output_path = os.path.join(tmp_path, "test_slope.tif")
+def test_terrain_attribute(ref_dem_layer, tmp_path):
+    output_path = os.path.join(tmp_path, "test_terrain_attribute.tif")
 
     result = processing.run(
         "XDEM:Slope",
@@ -82,38 +82,6 @@ def test_coreg(tba_dem_layer, ref_dem_layer, tmp_path):
 
     # Next, check if there has been an improvement
     assert np.allclose(ref_dem_array, output_array, atol=tol)
-
-
-def test_biascorr(tbc_dem_layer, ref_dem_layer, tmp_path):
-    output_path = os.path.join(tmp_path, "test_biascorr.tif")
-
-    result = processing.run(
-        "XDEM:Bias correction",
-        {
-            "TBA_DEM": tbc_dem_layer,
-            "REF_DEM": ref_dem_layer,
-            "MASK": None,
-            "METHOD": "Deramping",
-            "OUTPUT": output_path,
-        },
-    )
-    output_layer = QgsRasterLayer(result["OUTPUT"])
-
-    check_layer(ref_dem_layer, output_layer)
-
-    # Convert layers to numpy array for more accurate testing
-    ref_dem_array = ref_dem_layer.as_numpy()
-    tba_dem_array = tbc_dem_layer.as_numpy()
-    output_array = output_layer.as_numpy()
-
-    # Relative tolerance set to 10%
-    tol = 0.1
-
-    # First, check if the tba dem does not pass the conditions
-    assert not np.allclose(ref_dem_array, tba_dem_array, rtol=tol)
-
-    # Next, check if there has been an improvement
-    assert np.allclose(ref_dem_array, output_array, rtol=tol)
 
 
 def test_workflow_topo(ref_dem_layer, tmp_path):

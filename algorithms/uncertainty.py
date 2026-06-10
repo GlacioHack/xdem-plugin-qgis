@@ -24,7 +24,7 @@ from qgis.core import (
     QgsProcessingParameterRasterLayer,
 )
 
-from .processing_tools import XdemProcessingAlgorithm
+from .base_processing import XdemProcessingAlgorithm
 
 
 class Heteroscedasticity(XdemProcessingAlgorithm):
@@ -40,7 +40,6 @@ class Heteroscedasticity(XdemProcessingAlgorithm):
         - param MASK: The mask corresponding to the stable terrain (0 for unstable, 1 for stable).
         - param OUTPUT: The the error map.
         """
-
         self.addParameter(
             QgsProcessingParameterRasterLayer(name="AL_DEM", description="Aligned DEM")
         )

@@ -18,12 +18,17 @@
 # limitations under the License.
 
 
+import io
+import os
+from contextlib import redirect_stdout
+
 import geoutils as gu
 from qgis.core import QgsProcessingAlgorithm
 from qgis.PyQt.QtCore import QCoreApplication
+from qgis.PyQt.QtGui import QIcon
 
 
-# Main processing class
+# Base processing class
 class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
     """
     This class represents the base class from which all xDEM algorithms inherit.
@@ -39,10 +44,36 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
     def group(self):
         return self.tr(self.groupId())
 
+    def icon(self):
+        plugin_dir = os.path.dirname(os.path.dirname(__file__))
+        icon_path = os.path.join(plugin_dir, "img", "xdem_algos_logo.png")
+        return QIcon(icon_path)
+
     def tr(self, string):
         return QCoreApplication.translate("Processing", string)
 
+    def get_dem_info(self, feedback, dem):
+        """
+        Returns information about the DEM in the logs
+        """
+        metadata = io.StringIO()
+        with redirect_stdout(metadata):
+            dem.info()
+        feedback.pushInfo(metadata.getvalue())
+
+    def get_coreg_info(self, feedback, coreg):
+        """
+        Returns information about corrections in the logs
+        """
+        metadata = io.StringIO()
+        with redirect_stdout(metadata):
+            coreg.info()
+        feedback.pushInfo(metadata.getvalue())
+
     def load_mask(self, parameters, context, feedback):
+        """
+        Returns a gu.Raster mask layer if one is provided
+        """
         inlier_mask_layer = self.parameterAsRasterLayer(parameters, "MASK", context)
         if inlier_mask_layer is not None:
             inlier_mask_path = inlier_mask_layer.dataProvider().dataSourceUri()
