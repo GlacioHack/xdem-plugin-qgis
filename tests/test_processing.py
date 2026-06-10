@@ -84,8 +84,8 @@ def test_coreg(tba_dem_layer, ref_dem_layer, tmp_path):
     assert np.allclose(ref_dem_array, output_array, atol=tol)
 
 
-def test_workflow_topo(ref_dem_layer, tmp_path):
-    output_folder = os.path.join(tmp_path, "test_workflow_topo")
+def test_workflow(ref_dem_layer, tmp_path):
+    output_folder = os.path.join(tmp_path, "test_workflow")
 
     attributes = ["slope", "aspect", "hillshade", "profile_curvature"]
 
