@@ -29,25 +29,7 @@ from qgis.core import (
     QgsProcessingParameterRasterLayer,
 )
 
-from .processing_tools import XdemProcessingAlgorithm
-
-# Dictionaries listing bias correction and coregistration methods
-
-BIAS_METHODS = {
-    "Deramping": xdem.coreg.Deramp(),
-    "Directional biases": xdem.coreg.DirectionalBias(),
-    "Terrain biases": xdem.coreg.TerrainBias(),
-}
-
-
-COREG_METHODS = {
-    "Nuth and Kääb (2011)": xdem.coreg.NuthKaab(),
-    "Minimization of dh": xdem.coreg.DhMinimize(),
-    "Least Z-difference": xdem.coreg.LZD(),
-    "Iterative closest point": xdem.coreg.ICP(),
-    "Coherent point drift": xdem.coreg.CPD(),
-    "Vertical shift": xdem.coreg.VerticalShift(),
-}
+from .base_processing import XdemProcessingAlgorithm
 
 
 class BiasCorrection(XdemProcessingAlgorithm):
@@ -63,6 +45,12 @@ class BiasCorrection(XdemProcessingAlgorithm):
         - param METHOD: Specifies the bias correction method (e.g., "Deramping", "Directional biases").
         - param OUTPUT: The aligned DEM.
         """
+        self.methods = {
+            "Deramping": xdem.coreg.Deramp(),
+            "Directional biases": xdem.coreg.DirectionalBias(),
+            "Terrain biases": xdem.coreg.TerrainBias(),
+        }
+
         self.addParameter(
             QgsProcessingParameterRasterLayer(
                 name="TBA_DEM", description="DEM to be aligned"
@@ -85,7 +73,7 @@ class BiasCorrection(XdemProcessingAlgorithm):
             QgsProcessingParameterEnum(
                 name="METHOD",
                 description="Method",
-                options=BIAS_METHODS,
+                options=self.methods,
                 defaultValue="Deramping",
                 usesStaticStrings=True,
             )
@@ -115,7 +103,7 @@ class BiasCorrection(XdemProcessingAlgorithm):
         inlier_mask = self.load_mask(parameters, context, feedback)
 
         # Loading the corresponding method
-        coreg = BIAS_METHODS[method]
+        coreg = self.methods[method]
 
         coreg.fit(ref_dem, tba_dem, inlier_mask)
         aligned_dem = coreg.apply(tba_dem)
@@ -132,7 +120,7 @@ class BiasCorrection(XdemProcessingAlgorithm):
         return "Corrections"
 
     def tags(self):
-        return BIAS_METHODS
+        return self.methods
 
     def shortHelpString(self):
         return (
@@ -158,6 +146,15 @@ class Coregistration(XdemProcessingAlgorithm):
         - param BLOCKSIZE: Block size for blockwise execution.
         - param OUTPUT: The aligned DEM.
         """
+        self.methods = {
+            "Nuth and Kääb (2011)": xdem.coreg.NuthKaab(),
+            "Minimization of dh": xdem.coreg.DhMinimize(),
+            "Least Z-difference": xdem.coreg.LZD(),
+            "Iterative closest point": xdem.coreg.ICP(),
+            "Coherent point drift": xdem.coreg.CPD(),
+            "Vertical shift": xdem.coreg.VerticalShift(),
+        }
+
         self.addParameter(
             QgsProcessingParameterRasterLayer(
                 name="TBA_DEM", description="DEM to be aligned"
@@ -180,7 +177,7 @@ class Coregistration(XdemProcessingAlgorithm):
             QgsProcessingParameterEnum(
                 name="METHOD",
                 description="Method",
-                options=COREG_METHODS,
+                options=self.methods,
                 defaultValue="Nuth and Kääb (2011)",
                 usesStaticStrings=True,
             )
@@ -218,7 +215,7 @@ class Coregistration(XdemProcessingAlgorithm):
 
         inlier_mask = self.load_mask(parameters, context, feedback)
 
-        coreg = COREG_METHODS[method]
+        coreg = self.methods[method]
 
         # Configuring blockwise if a block size is specified and if Nuth and Kääb is config
         if block_size != 0 and method == "Nuth and Kääb (2011)":
@@ -246,13 +243,12 @@ class Coregistration(XdemProcessingAlgorithm):
         return "Corrections"
 
     def tags(self):
-        return COREG_METHODS
+        return self.methods
 
     def shortHelpString(self):
         return (
             "This algorithm enables the coregistration of two DEMs by applying 3D affine transformations.\n"
-            "Affine transformations can include vertical and horizontal translations, rotations and reflections, and scalings.\n"
-            "Curently, Blockwise work only with Nuth and Kääb (2011)."
+            "Affine transformations can include vertical and horizontal translations, rotations and reflections, and scalings."
         )
 
     def createInstance(self):

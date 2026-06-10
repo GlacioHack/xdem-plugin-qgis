@@ -44,6 +44,7 @@ class XdemInstaller:
             "matplotlib",  # for worklfows plots
             "pytest",  # for tests
             "scikit-learn",  # for blockwise coreg
+            "laspy[lazrs]",  # for EPC support
             "xdem",
         ]
 

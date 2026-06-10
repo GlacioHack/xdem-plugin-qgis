@@ -31,7 +31,7 @@ from qgis.utils import iface
 from xdem.workflows import Accuracy, Topo
 from xdem.workflows.schemas import COREG_METHODS, STATS_METHODS, TERRAIN_ATTRIBUTES
 
-from .processing_tools import XdemProcessingAlgorithm
+from .base_processing import XdemProcessingAlgorithm
 
 COREG_METHODS = COREG_METHODS[:-1]  # Squeeze the last value (None)
 

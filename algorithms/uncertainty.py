@@ -24,7 +24,7 @@ from qgis.core import (
     QgsProcessingParameterRasterLayer,
 )
 
-from .processing_tools import XdemProcessingAlgorithm
+from .base_processing import XdemProcessingAlgorithm
 
 
 class Heteroscedasticity(XdemProcessingAlgorithm):

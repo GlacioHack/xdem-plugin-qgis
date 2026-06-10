@@ -16,6 +16,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+
 import io
 import os
 from contextlib import redirect_stdout
@@ -26,7 +28,7 @@ from qgis.PyQt.QtCore import QCoreApplication
 from qgis.PyQt.QtGui import QIcon
 
 
-# Main processing class
+# Base processing class
 class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
     """
     This class represents the base class from which all xDEM algorithms inherit.

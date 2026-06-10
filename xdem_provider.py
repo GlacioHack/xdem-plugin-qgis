@@ -45,7 +45,6 @@ class XdemProvider(QgsProcessingProvider):
         self.addAlgorithm(Aspect())
         self.addAlgorithm(FlowlineCurvature())
         self.addAlgorithm(FractalRoughness())
-        self.addAlgorithm(GetTerrainAttributes())
         self.addAlgorithm(Hillshade())
         self.addAlgorithm(MaxCurvature())
         self.addAlgorithm(MinCurvature())

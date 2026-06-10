@@ -18,22 +18,16 @@
 # limitations under the License.
 
 
-import os
-
 import xdem
 from qgis.core import (
-    QgsProcessingParameterBoolean,
     QgsProcessingParameterDefinition,
     QgsProcessingParameterEnum,
-    QgsProcessingParameterFolderDestination,
     QgsProcessingParameterNumber,
     QgsProcessingParameterRasterDestination,
     QgsProcessingParameterRasterLayer,
 )
-from qgis.utils import iface
-from xdem.terrain import available_attributes
 
-from .processing_tools import XdemProcessingAlgorithm
+from .base_processing import XdemProcessingAlgorithm
 
 
 class TerrainAttributes(XdemProcessingAlgorithm):
@@ -252,6 +246,72 @@ class Hillshade(TerrainAttributes):
         return Hillshade()
 
 
+class TopographicPositionIndex(TerrainAttributes):
+    def get_attribute_and_parameters(self, parameters, context):
+        return lambda dem: dem.topographic_position_index()
+
+    def name(self):
+        return "Topographic position index"
+
+    def createInstance(self):
+        return TopographicPositionIndex()
+
+
+class TerrainRuggednessIndex(TerrainAttributes):
+    def get_attribute_and_parameters(self, parameters, context):
+        return lambda dem: dem.terrain_ruggedness_index()
+
+    def name(self):
+        return "Terrain ruggedness index"
+
+    def createInstance(self):
+        return TerrainRuggednessIndex()
+
+
+class Roughness(TerrainAttributes):
+    def get_attribute_and_parameters(self, parameters, context):
+        return lambda dem: dem.roughness()
+
+    def name(self):
+        return "Roughness"
+
+    def createInstance(self):
+        return Roughness()
+
+
+class Rugosity(TerrainAttributes):
+    def get_attribute_and_parameters(self, parameters, context):
+        return lambda dem: dem.rugosity()
+
+    def name(self):
+        return "Rugosity"
+
+    def createInstance(self):
+        return Rugosity()
+
+
+class FractalRoughness(TerrainAttributes):
+    def get_attribute_and_parameters(self, parameters, context):
+        return lambda dem: dem.fractal_roughness()
+
+    def name(self):
+        return "Fractal roughness"
+
+    def createInstance(self):
+        return FractalRoughness()
+
+
+class TextureShading(TerrainAttributes):
+    def get_attribute_and_parameters(self, parameters, context):
+        return lambda dem: dem.texture_shading()
+
+    def name(self):
+        return "Texture shading"
+
+    def createInstance(self):
+        return TextureShading()
+
+
 class Curvature(TerrainAttributes):
     """
     This class represents the base class from which all curvature inherit.
@@ -376,147 +436,3 @@ class MinCurvature(Curvature):
 
     def createInstance(self):
         return MinCurvature()
-
-
-class TopographicPositionIndex(TerrainAttributes):
-    def get_attribute_and_parameters(self, parameters, context):
-        return lambda dem: dem.topographic_position_index()
-
-    def name(self):
-        return "Topographic position index"
-
-    def createInstance(self):
-        return TopographicPositionIndex()
-
-
-class TerrainRuggednessIndex(TerrainAttributes):
-    def get_attribute_and_parameters(self, parameters, context):
-        return lambda dem: dem.terrain_ruggedness_index()
-
-    def name(self):
-        return "Terrain ruggedness index"
-
-    def createInstance(self):
-        return TerrainRuggednessIndex()
-
-
-class Roughness(TerrainAttributes):
-    def get_attribute_and_parameters(self, parameters, context):
-        return lambda dem: dem.roughness()
-
-    def name(self):
-        return "Roughness"
-
-    def createInstance(self):
-        return Roughness()
-
-
-class Rugosity(TerrainAttributes):
-    def get_attribute_and_parameters(self, parameters, context):
-        return lambda dem: dem.rugosity()
-
-    def name(self):
-        return "Rugosity"
-
-    def createInstance(self):
-        return Rugosity()
-
-
-class FractalRoughness(TerrainAttributes):
-    def get_attribute_and_parameters(self, parameters, context):
-        return lambda dem: dem.fractal_roughness()
-
-    def name(self):
-        return "Fractal roughness"
-
-    def createInstance(self):
-        return FractalRoughness()
-
-
-class TextureShading(TerrainAttributes):
-    def get_attribute_and_parameters(self, parameters, context):
-        return lambda dem: dem.texture_shading()
-
-    def name(self):
-        return "Texture shading"
-
-    def createInstance(self):
-        return TextureShading()
-
-
-class GetTerrainAttributes(XdemProcessingAlgorithm):
-    """
-    This class enables the simultaneous calculation of a wide range of terrain attributes.
-    """
-
-    def initAlgorithm(self, config=None):
-        self.addParameter(
-            QgsProcessingParameterRasterLayer(name="DEM", description="DEM")
-        )
-
-        self.addParameter(
-            QgsProcessingParameterEnum(
-                name="ATTRIBUTES",
-                description="Attributes",
-                options=available_attributes,
-                defaultValue=["slope", "aspect", "hillshade", "profile_curvature"],
-                allowMultiple=True,
-                usesStaticStrings=True,
-            )
-        )
-
-        self.addParameter(
-            QgsProcessingParameterBoolean(
-                name="ADD_LAYERS",
-                description="Add layers to project",
-                defaultValue=True,
-            )
-        )
-
-        self.addParameter(
-            QgsProcessingParameterFolderDestination(
-                name="OUTPUT", description="Attributes folder"
-            )
-        )
-
-    def processAlgorithm(self, parameters, context, feedback):
-        # Loading the layer from QGIS
-        dem_layer = self.parameterAsRasterLayer(parameters, "DEM", context)
-
-        # Loading attributes list
-        attributes_list = self.parameterAsEnumStrings(parameters, "ATTRIBUTES", context)
-
-        # Extracting the path
-        dem_path = dem_layer.dataProvider().dataSourceUri()
-
-        dem = xdem.DEM(dem_path)
-
-        output_folder = self.parameterAsString(parameters, "OUTPUT", context)
-        os.makedirs(output_folder, exist_ok=True)
-
-        attributes = dem.get_terrain_attribute(attribute=attributes_list)
-
-        if len(attributes_list) == 1:
-            attributes = [attributes]
-
-        for name, res in zip(attributes_list, attributes):
-            output = os.path.join(output_folder, f"{name}.tif")
-            res.to_file(output)
-
-        add_layers = self.parameterAsBoolean(parameters, "ADD_LAYERS", context)
-        if add_layers:
-            for file in os.listdir(output_folder):
-                file_path = os.path.join(output_folder, file)
-                if file_path.endswith(".tif"):
-                    iface.addRasterLayer(file_path)
-
-        return {}
-
-    def name(self):
-        return "Get terrain attributes"
-
-    def groupId(self):
-        return "Terrain attributes"
-
-    def createInstance(self):
-        return GetTerrainAttributes()
