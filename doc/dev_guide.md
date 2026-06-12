@@ -5,7 +5,7 @@ This guide provide the detailed documentation for developers.
 ```
 xdem-plugin-qgis/
 ├── algorithms/
-│   ├── base_processing.py
+│   ├── base.py
 │   ├── corrections.py
 │   ├── terrain_attributes.py
 │   ├── uncertainty.py

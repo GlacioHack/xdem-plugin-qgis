@@ -39,7 +39,6 @@ class XdemProvider(QgsProcessingProvider):
         # Corrections
         self.addAlgorithm(BiasCorrection())
         self.addAlgorithm(Coregistration())
-        self.addAlgorithm(GapFilling())
 
         # Terrain attributes
         self.addAlgorithm(Aspect())

@@ -27,7 +27,7 @@ from qgis.core import (
     QgsProcessingParameterRasterLayer,
 )
 
-from .base_processing import XdemProcessingAlgorithm
+from .base import XdemProcessingAlgorithm
 
 
 class TerrainAttributes(XdemProcessingAlgorithm):
@@ -41,12 +41,16 @@ class TerrainAttributes(XdemProcessingAlgorithm):
         - param OUTPUT: The final results.
         """
         self.addParameter(
-            QgsProcessingParameterRasterLayer(name="DEM", description="DEM")
+            QgsProcessingParameterRasterLayer(
+                name="DEM",
+                description="DEM",
+            )
         )
 
         self.addParameter(
             QgsProcessingParameterRasterDestination(
-                name="OUTPUT", description=self.name()
+                name="OUTPUT",
+                description=self.name(),
             )
         )
 
