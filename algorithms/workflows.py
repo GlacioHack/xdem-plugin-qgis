@@ -31,9 +31,20 @@ from qgis.utils import iface
 from xdem.workflows import Accuracy, Topo
 from xdem.workflows.schemas import COREG_METHODS, STATS_METHODS, TERRAIN_ATTRIBUTES
 
-from .base_processing import XdemProcessingAlgorithm
+from .base import XdemProcessingAlgorithm
 
 COREG_METHODS = COREG_METHODS[:-1]  # Squeeze the last value (None)
+
+
+def add_layers_to_project(add_layers, output_folder):
+    """
+    Add the workflow output layers to the current project
+    """
+    if add_layers:
+        rasters_folder = os.path.join(output_folder, "rasters")
+        for file in os.listdir(rasters_folder):
+            file_path = os.path.join(rasters_folder, file)
+            iface.addRasterLayer(file_path)
 
 
 class AccuracyWorkflow(XdemProcessingAlgorithm):
@@ -54,13 +65,15 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
         """
         self.addParameter(
             QgsProcessingParameterRasterLayer(
-                name="TBA_DEM", description="DEM to be aligned"
+                name="TBA_DEM",
+                description="To be aligned DEM",
             )
         )
 
         self.addParameter(
             QgsProcessingParameterRasterLayer(
-                name="REF_DEM", description="Reference DEM"
+                name="REF_DEM",
+                description="Reference DEM",
             )
         )
 
@@ -144,6 +157,7 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
 
         stats = self.parameterAsEnumStrings(parameters, "STATS", context)
         level = self.parameterAsInt(parameters, "LEVEL", context)
+        add_layers = self.parameterAsBoolean(parameters, "ADD_LAYERS", context)
         method1 = self.parameterAsString(parameters, "METHOD1", context)
         method2 = self.parameterAsString(parameters, "METHOD2", context)
         method3 = self.parameterAsString(parameters, "METHOD3", context)
@@ -175,13 +189,7 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
 
         workflow = Accuracy(config)
         workflow.run()
-
-        add_layers = self.parameterAsBoolean(parameters, "ADD_LAYERS", context)
-        if add_layers:
-            rasters_folder = os.path.join(output_folder, "rasters")
-            for file in os.listdir(rasters_folder):
-                file_path = os.path.join(rasters_folder, file)
-                iface.addRasterLayer(file_path)
+        add_layers_to_project(add_layers, output_folder)
 
         return {}
 
@@ -220,7 +228,10 @@ class TopoWorkflow(XdemProcessingAlgorithm):
         - param OUTPUT: The results folder.
         """
         self.addParameter(
-            QgsProcessingParameterRasterLayer(name="DEM", description="DEM")
+            QgsProcessingParameterRasterLayer(
+                name="DEM",
+                description="DEM",
+            )
         )
 
         self.addParameter(
@@ -279,6 +290,7 @@ class TopoWorkflow(XdemProcessingAlgorithm):
         attributes = self.parameterAsEnumStrings(parameters, "ATTRIBUTES", context)
         stats = self.parameterAsEnumStrings(parameters, "STATS", context)
         level = self.parameterAsInt(parameters, "LEVEL", context)
+        add_layers = self.parameterAsBoolean(parameters, "ADD_LAYERS", context)
 
         output_folder = self.parameterAsString(parameters, "OUTPUT", context)
         os.makedirs(output_folder, exist_ok=True)
@@ -298,13 +310,7 @@ class TopoWorkflow(XdemProcessingAlgorithm):
 
         workflow = Topo(config)
         workflow.run()
-
-        add_layers = self.parameterAsBoolean(parameters, "ADD_LAYERS", context)
-        if add_layers:
-            rasters_folder = os.path.join(output_folder, "rasters")
-            for file in os.listdir(rasters_folder):
-                file_path = os.path.join(rasters_folder, file)
-                iface.addRasterLayer(file_path)
+        add_layers_to_project(add_layers, output_folder)
 
         return {}
 

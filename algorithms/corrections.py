@@ -29,7 +29,7 @@ from qgis.core import (
     QgsProcessingParameterRasterLayer,
 )
 
-from .base_processing import XdemProcessingAlgorithm
+from .base import XdemProcessingAlgorithm
 
 
 class BiasCorrection(XdemProcessingAlgorithm):
@@ -53,13 +53,15 @@ class BiasCorrection(XdemProcessingAlgorithm):
 
         self.addParameter(
             QgsProcessingParameterRasterLayer(
-                name="TBA_DEM", description="DEM to be aligned"
+                name="TBA_DEM",
+                description="To be aligned DEM",
             )
         )
 
         self.addParameter(
             QgsProcessingParameterRasterLayer(
-                name="REF_DEM", description="Reference DEM"
+                name="REF_DEM",
+                description="Reference DEM",
             )
         )
 
@@ -99,7 +101,6 @@ class BiasCorrection(XdemProcessingAlgorithm):
 
         tba_dem = xdem.DEM(tba_dem_path)
         ref_dem = xdem.DEM(ref_dem_path)
-
         inlier_mask = self.load_mask(parameters, context, feedback)
 
         # Loading the corresponding method
@@ -157,13 +158,15 @@ class Coregistration(XdemProcessingAlgorithm):
 
         self.addParameter(
             QgsProcessingParameterRasterLayer(
-                name="TBA_DEM", description="DEM to be aligned"
+                name="TBA_DEM",
+                description="To be aligned DEM",
             )
         )
 
         self.addParameter(
             QgsProcessingParameterRasterLayer(
-                name="REF_DEM", description="Reference DEM"
+                name="REF_DEM",
+                description="Reference DEM",
             )
         )
 
@@ -212,13 +215,13 @@ class Coregistration(XdemProcessingAlgorithm):
 
         tba_dem = xdem.DEM(tba_dem_path)
         ref_dem = xdem.DEM(ref_dem_path)
-
         inlier_mask = self.load_mask(parameters, context, feedback)
 
         coreg = self.methods[method]
 
-        # Configuring blockwise if a block size is specified and if Nuth and Kääb is config
-        if block_size != 0 and method == "Nuth and Kääb (2011)":
+        # Configuring blockwise
+        if block_size != 0:
+            feedback.pushWarning("Currently, Blockwise only works with Nuth Kaab")
             blockwise = xdem.coreg.BlockwiseCoreg(
                 coreg,
                 block_size_fit=block_size,
@@ -226,11 +229,12 @@ class Coregistration(XdemProcessingAlgorithm):
                 parent_path=os.path.dirname(__file__),
             )
             blockwise.fit(ref_dem, tba_dem, inlier_mask)
-            aligned_dem = blockwise.apply()
+            aligned_dem = blockwise.apply()  # Note: In xdem 0.2.4 BlockwiseCoreg.apply() will take a tba_dem as input.
         else:
             coreg.fit(ref_dem, tba_dem, inlier_mask)
             aligned_dem = coreg.apply(tba_dem)
-            self.get_coreg_info(feedback, coreg)
+
+        self.get_coreg_info(feedback, coreg)
 
         aligned_dem.to_file(output_path)
 
@@ -253,67 +257,3 @@ class Coregistration(XdemProcessingAlgorithm):
 
     def createInstance(self):
         return Coregistration()
-
-
-class GapFilling(XdemProcessingAlgorithm):
-    """
-    This class is designed to fill in gaps in the DEM using an IDW method.
-    """
-
-    def initAlgorithm(self, config=None):
-        """
-        - param TBF_DEM: The DEM to be filled out.
-        - param OUTPUT: The filled DEM.
-        """
-        self.addParameter(
-            QgsProcessingParameterRasterLayer(
-                name="TBF_DEM", description="DEM to be filled"
-            )
-        )
-
-        self.addParameter(
-            QgsProcessingParameterRasterDestination(
-                name="OUTPUT", description="Filled DEM"
-            )
-        )
-
-    def processAlgorithm(self, parameters, context, feedback):
-        # Loading layer from QGIS
-        dem_layer = self.parameterAsRasterLayer(parameters, "TBF_DEM", context)
-
-        # Extracting path
-        dem_path = dem_layer.dataProvider().dataSourceUri()
-
-        output_path = self.parameterAsOutputLayer(parameters, "OUTPUT", context)
-
-        dem = xdem.DEM(dem_path)
-
-        # Conversion to DEM difference object
-        ddem = xdem.dDEM(raster=dem, start_time=None, end_time=None)
-
-        filled_array = ddem.interpolate(method="idw")
-
-        # Interpolation returns an array, it must be converted to a DEM
-        filled_dem = xdem.DEM.from_array(
-            filled_array, transform=dem.transform, crs=dem.crs
-        )
-
-        filled_dem.to_file(output_path)
-
-        return {"OUTPUT": output_path}
-
-    def name(self):
-        return "Gap filling"
-
-    def groupId(self):
-        return "Corrections"
-
-    def shortHelpString(self):
-        return (
-            "This algorithm uses the IDW (Inverse-distance weighting) method.\n"
-            "Empty areas are filled with a weighted average of the surrounding pixel values, "
-            "with the weight being inversely proportional to their distance from the empty pixel."
-        )
-
-    def createInstance(self):
-        return GapFilling()

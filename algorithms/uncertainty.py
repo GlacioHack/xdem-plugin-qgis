@@ -24,7 +24,7 @@ from qgis.core import (
     QgsProcessingParameterRasterLayer,
 )
 
-from .base_processing import XdemProcessingAlgorithm
+from .base import XdemProcessingAlgorithm
 
 
 class Heteroscedasticity(XdemProcessingAlgorithm):
@@ -41,24 +41,31 @@ class Heteroscedasticity(XdemProcessingAlgorithm):
         - param OUTPUT: The the error map.
         """
         self.addParameter(
-            QgsProcessingParameterRasterLayer(name="AL_DEM", description="Aligned DEM")
-        )
-
-        self.addParameter(
             QgsProcessingParameterRasterLayer(
-                name="REF_DEM", description="Reference DEM"
+                name="AL_DEM",
+                description="Aligned DEM",
             )
         )
 
         self.addParameter(
             QgsProcessingParameterRasterLayer(
-                name="MASK", description="Stable terrain mask", defaultValue=None
+                name="REF_DEM",
+                description="Reference DEM",
+            )
+        )
+
+        self.addParameter(
+            QgsProcessingParameterRasterLayer(
+                name="MASK",
+                description="Stable terrain mask",
+                defaultValue=None,
             )
         )
 
         self.addParameter(
             QgsProcessingParameterRasterDestination(
-                name="OUTPUT", description="Map of variable error"
+                name="OUTPUT",
+                description="Map of variable error",
             )
         )
 

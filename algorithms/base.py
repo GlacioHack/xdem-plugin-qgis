@@ -28,7 +28,6 @@ from qgis.PyQt.QtCore import QCoreApplication
 from qgis.PyQt.QtGui import QIcon
 
 
-# Base processing class
 class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
     """
     This class represents the base class from which all xDEM algorithms inherit.
