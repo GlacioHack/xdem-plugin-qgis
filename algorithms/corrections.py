@@ -96,7 +96,7 @@ class BiasCorrection(XdemProcessingAlgorithm):
         tba_dem_path = tba_dem_layer.dataProvider().dataSourceUri()
         ref_dem_path = ref_dem_layer.dataProvider().dataSourceUri()
 
-        method = self.parameterAsString(parameters, "METHOD", context)
+        method_name = self.parameterAsString(parameters, "METHOD", context)
         output_path = self.parameterAsOutputLayer(parameters, "OUTPUT", context)
 
         tba_dem = xdem.DEM(tba_dem_path)
@@ -104,7 +104,7 @@ class BiasCorrection(XdemProcessingAlgorithm):
         inlier_mask = self.load_mask(parameters, context, feedback)
 
         # Loading the corresponding method
-        coreg = self.methods[method]
+        coreg = self.methods[method_name]
 
         coreg.fit(ref_dem, tba_dem, inlier_mask)
         aligned_dem = coreg.apply(tba_dem)
@@ -209,7 +209,7 @@ class Coregistration(XdemProcessingAlgorithm):
         tba_dem_path = tba_dem_layer.dataProvider().dataSourceUri()
         ref_dem_path = ref_dem_layer.dataProvider().dataSourceUri()
 
-        method = self.parameterAsString(parameters, "METHOD", context)
+        method_name = self.parameterAsString(parameters, "METHOD", context)
         block_size = self.parameterAsInt(parameters, "BLOCKSIZE", context)
         output_path = self.parameterAsOutputLayer(parameters, "OUTPUT", context)
 
@@ -217,7 +217,7 @@ class Coregistration(XdemProcessingAlgorithm):
         ref_dem = xdem.DEM(ref_dem_path)
         inlier_mask = self.load_mask(parameters, context, feedback)
 
-        coreg = self.methods[method]
+        coreg = self.methods[method_name]
 
         # Configuring blockwise
         if block_size != 0:
