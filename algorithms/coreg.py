@@ -74,7 +74,7 @@ class Coreg(XdemProcessingAlgorithm):
 
         self.addParameter(
             QgsProcessingParameterRasterDestination(
-                name="OUTPUT", description=(f"Coreg - {self.name()}")
+                name="OUTPUT", description=(f"Output - {self.name()}")
             )
         )
 

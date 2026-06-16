@@ -69,11 +69,11 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
         """
         Add all the parameters of a function into the QGIS UI
         """
-        sig = inspect.signature(func)
-        types = get_type_hints(func)
+        function_signature = inspect.signature(func)
+        parameters_types = get_type_hints(func)
 
-        for name, param in sig.parameters.items():
-            param_type = types.get(name, param.annotation)
+        for name, param in function_signature.parameters.items():
+            param_type = parameters_types.get(name, param.annotation)
 
             if name == "self":
                 continue
@@ -121,13 +121,13 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
         """
         Get all arguments entered into QGIS
         """
-        sig = inspect.signature(func)
-        types = get_type_hints(func)
+        function_signature = inspect.signature(func)
+        parameters_types = get_type_hints(func)
 
         kwargs = {}
 
-        for name, param in sig.parameters.items():
-            param_type = types.get(name, param.annotation)
+        for name, param in function_signature.parameters.items():
+            param_type = parameters_types.get(name, param.annotation)
 
             if name == "self":
                 continue
