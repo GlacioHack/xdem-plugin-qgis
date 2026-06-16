@@ -60,13 +60,15 @@ class Coreg(XdemProcessingAlgorithm):
             )
         )
 
-        parameter = QgsProcessingParameterNumber(
-            name="BLOCKSIZE",
-            description="blocksize",
-            type=QgsProcessingParameterNumber.Integer,
-            defaultValue=None,
-        )
-        self.add_advanced_param(parameter)
+        # Blockwise only for coregistration
+        if self.groupId() == "Coregistration":
+            parameter = QgsProcessingParameterNumber(
+                name="BLOCKSIZE",
+                description="blocksize",
+                type=QgsProcessingParameterNumber.Integer,
+                defaultValue=None,
+            )
+            self.add_advanced_param(parameter)
 
         self.coreg_class = self.coreg_class()
 
