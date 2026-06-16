@@ -1,0 +1,260 @@
+# Copyright (c) 2026 xDEM developers
+#
+# This file is part of the xDEM project:
+# https://github.com/glaciohack/xdem
+# https://github.com/GlacioHack/xdem-plugin-qgis
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+#
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+import io
+import os
+from contextlib import redirect_stdout
+
+import geoutils as gu
+import xdem
+from qgis.core import (
+    QgsProcessingParameterNumber,
+    QgsProcessingParameterRasterDestination,
+    QgsProcessingParameterRasterLayer,
+)
+
+from .base import XdemProcessingAlgorithm
+
+
+class Coreg(XdemProcessingAlgorithm):
+    def initAlgorithm(self, config=None):
+        """
+        Get all the parameters of a function and displays them in the QGIS UI
+        """
+        self.addParameter(
+            QgsProcessingParameterRasterLayer(
+                name="TBA_DEM",
+                description="To be aligned DEM",
+            )
+        )
+
+        self.addParameter(
+            QgsProcessingParameterRasterLayer(
+                name="REF_DEM",
+                description="Reference DEM",
+            )
+        )
+
+        self.addParameter(
+            QgsProcessingParameterRasterLayer(
+                name="MASK",
+                description="Inlier mask",
+                optional=True,
+            )
+        )
+
+        parameter = QgsProcessingParameterNumber(
+            name="BLOCKSIZE",
+            description="blocksize",
+            type=QgsProcessingParameterNumber.Integer,
+            defaultValue=None,
+        )
+        self.add_advanced_param(parameter)
+
+        self.coreg_class = self.coreg_class()
+
+        self.add_specific_parameters(self.coreg_class.__init__)
+
+        self.addParameter(
+            QgsProcessingParameterRasterDestination(
+                name="OUTPUT", description=(f"Coreg - {self.name()}")
+            )
+        )
+
+    def coreg_info(self, feedback, coreg):
+        metadata = io.StringIO()
+        with redirect_stdout(metadata):
+            coreg.info()
+        feedback.pushInfo(metadata.getvalue())
+
+    def processAlgorithm(self, parameters, context, feedback):
+        tba_layer = self.parameterAsRasterLayer(parameters, "TBA_DEM", context)
+        ref_layer = self.parameterAsRasterLayer(parameters, "REF_DEM", context)
+        inlier_mask_layer = self.parameterAsRasterLayer(parameters, "MASK", context)
+        block_size = self.parameterAsInt(parameters, "BLOCKSIZE", context)
+        output_path = self.parameterAsOutputLayer(parameters, "OUTPUT", context)
+
+        ref_dem = xdem.DEM(ref_layer.source())
+        tba_dem = xdem.DEM(tba_layer.source())
+
+        if inlier_mask_layer is not None:
+            inlier_mask = gu.Raster(inlier_mask_layer.source(), is_mask=True)
+        else:
+            inlier_mask = None
+
+        kwargs = self.get_kwargs(self.coreg_class.__init__, parameters, context)
+
+        coreg = self.coreg_class(**kwargs)
+
+        if block_size:
+            blockwise = xdem.coreg.BlockwiseCoreg(
+                coreg,
+                block_size_fit=block_size,
+                block_size_apply=block_size,
+                parent_path=os.path.dirname(output_path),
+            )
+            blockwise.fit(
+                reference_elev=ref_dem,
+                to_be_aligned_elev=tba_dem,
+                inlier_mask=inlier_mask,
+            )
+            aligned_dem = blockwise.apply()
+
+        else:
+            coreg.fit(
+                reference_elev=ref_dem,
+                to_be_aligned_elev=tba_dem,
+                inlier_mask=inlier_mask,
+            )
+            aligned_dem = coreg.apply(tba_dem)
+
+        self.coreg_info(feedback, coreg)
+
+        aligned_dem.to_file(output_path)
+
+        return {"OUTPUT": output_path}
+
+
+# Coregistration
+class CPDCoreg(Coreg):
+    def coreg_class(self):
+        return xdem.coreg.CPD
+
+    def name(self):
+        return "Coherent point drift"
+
+    def groupId(self):
+        return "Coregistration"
+
+    def createInstance(self):
+        return CPDCoreg()
+
+
+class ICPCoreg(Coreg):
+    def coreg_class(self):
+        return xdem.coreg.ICP
+
+    def name(self):
+        return "Iterative closest point"
+
+    def groupId(self):
+        return "Coregistration"
+
+    def createInstance(self):
+        return ICPCoreg()
+
+
+class LZDCoreg(Coreg):
+    def coreg_class(self):
+        return xdem.coreg.LZD
+
+    def name(self):
+        return "Least Z-difference"
+
+    def groupId(self):
+        return "Coregistration"
+
+    def createInstance(self):
+        return LZDCoreg()
+
+
+class DhMinimizeCoreg(Coreg):
+    def coreg_class(self):
+        return xdem.coreg.DhMinimize
+
+    def name(self):
+        return "Minimization of dh"
+
+    def groupId(self):
+        return "Coregistration"
+
+    def createInstance(self):
+        return DhMinimizeCoreg()
+
+
+class NuthKaabCoreg(Coreg):
+    def coreg_class(self):
+        return xdem.coreg.NuthKaab
+
+    def name(self):
+        return "Nuth Kääb (2011)"
+
+    def groupId(self):
+        return "Coregistration"
+
+    def createInstance(self):
+        return NuthKaabCoreg()
+
+
+class VerticalShift(Coreg):
+    def coreg_class(self):
+        return xdem.coreg.VerticalShift
+
+    def name(self):
+        return "Vertical shift"
+
+    def groupId(self):
+        return "Coregistration"
+
+    def createInstance(self):
+        return VerticalShift()
+
+
+# Bias correction
+class DerampCoreg(Coreg):
+    def coreg_class(self):
+        return xdem.coreg.Deramp
+
+    def name(self):
+        return "Deramping"
+
+    def groupId(self):
+        return "Bias correction"
+
+    def createInstance(self):
+        return DerampCoreg()
+
+
+class DirectionalBiasCoreg(Coreg):
+    def coreg_class(self):
+        return xdem.coreg.DirectionalBias
+
+    def name(self):
+        return "Directional bias"
+
+    def groupId(self):
+        return "Bias correction"
+
+    def createInstance(self):
+        return DirectionalBiasCoreg()
+
+
+class TerrainBiasCoreg(Coreg):
+    def coreg_class(self):
+        return xdem.coreg.TerrainBias
+
+    def name(self):
+        return "Terrain bias"
+
+    def groupId(self):
+        return "Bias correction"
+
+    def createInstance(self):
+        return TerrainBiasCoreg()

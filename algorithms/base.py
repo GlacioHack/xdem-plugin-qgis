@@ -18,12 +18,17 @@
 # limitations under the License.
 
 
-import io
+import inspect
 import os
-from contextlib import redirect_stdout
+from typing import Literal, get_args, get_origin, get_type_hints
 
-import geoutils as gu
-from qgis.core import QgsProcessingAlgorithm
+from qgis.core import (
+    QgsProcessingAlgorithm,
+    QgsProcessingParameterBoolean,
+    QgsProcessingParameterDefinition,
+    QgsProcessingParameterEnum,
+    QgsProcessingParameterNumber,
+)
 from qgis.PyQt.QtCore import QCoreApplication
 from qgis.PyQt.QtGui import QIcon
 
@@ -51,33 +56,94 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
     def tr(self, string):
         return QCoreApplication.translate("Processing", string)
 
-    def get_dem_info(self, feedback, dem):
+    def add_advanced_param(self, parameter):
         """
-        Returns information about the DEM in the logs
+        Specify in QGIS that this setting is located in the Advanced section
         """
-        metadata = io.StringIO()
-        with redirect_stdout(metadata):
-            dem.info()
-        feedback.pushInfo(metadata.getvalue())
+        parameter.setFlags(
+            parameter.flags() | QgsProcessingParameterDefinition.FlagAdvanced
+        )
+        self.addParameter(parameter)
 
-    def get_coreg_info(self, feedback, coreg):
+    def add_specific_parameters(self, func):
         """
-        Returns information about corrections in the logs
+        Add all the parameters of a function into the QGIS UI
         """
-        metadata = io.StringIO()
-        with redirect_stdout(metadata):
-            coreg.info()
-        feedback.pushInfo(metadata.getvalue())
+        sig = inspect.signature(func)
+        types = get_type_hints(func)
 
-    def load_mask(self, parameters, context, feedback):
+        for name, param in sig.parameters.items():
+            param_type = types.get(name, param.annotation)
+
+            if name == "self":
+                continue
+
+            if name == "method":  # Deprecated, surface fit is used in place of
+                continue
+
+            elif param_type is bool:
+                parameter = QgsProcessingParameterBoolean(
+                    name=name,
+                    description=name,
+                    defaultValue=param.default,
+                )
+                self.add_advanced_param(parameter)
+
+            elif param_type is int:
+                parameter = QgsProcessingParameterNumber(
+                    name=name,
+                    description=name,
+                    type=QgsProcessingParameterNumber.Integer,
+                    defaultValue=param.default,
+                )
+                self.add_advanced_param(parameter)
+
+            elif param_type is float:
+                parameter = QgsProcessingParameterNumber(
+                    name=name,
+                    description=name,
+                    type=QgsProcessingParameterNumber.Double,
+                    defaultValue=param.default,
+                )
+                self.add_advanced_param(parameter)
+
+            elif get_origin(param_type) is Literal:
+                options = list(get_args(param_type))
+                parameter = QgsProcessingParameterEnum(
+                    name=name,
+                    description=name,
+                    options=options,
+                    defaultValue=0,
+                )
+                self.add_advanced_param(parameter)
+
+    def get_kwargs(self, func, parameters, context):
         """
-        Returns a gu.Raster mask layer if one is provided
+        Get all arguments entered into QGIS
         """
-        inlier_mask_layer = self.parameterAsRasterLayer(parameters, "MASK", context)
-        if inlier_mask_layer is not None:
-            inlier_mask_path = inlier_mask_layer.dataProvider().dataSourceUri()
-            inlier_mask = gu.Raster(inlier_mask_path, is_mask=True)
-            feedback.pushInfo("Mask loaded")
-            return inlier_mask
-        else:
-            return None
+        sig = inspect.signature(func)
+        types = get_type_hints(func)
+
+        kwargs = {}
+
+        for name, param in sig.parameters.items():
+            param_type = types.get(name, param.annotation)
+
+            if name == "self":
+                continue
+
+            if param_type is bool:
+                kwargs[name] = self.parameterAsBoolean(parameters, name, context)
+
+            elif param_type is int:
+                kwargs[name] = self.parameterAsInt(parameters, name, context)
+
+            elif param_type is float:
+                kwargs[name] = self.parameterAsDouble(parameters, name, context)
+
+            elif get_origin(param_type) is Literal:
+                options = list(get_args(param_type))
+                index = self.parameterAsEnum(parameters, name, context)
+                kwargs[name] = options[index]
+
+        return kwargs
