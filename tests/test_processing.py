@@ -40,9 +40,9 @@ def test_terrain_attribute(ref_dem_layer, tmp_path):
     result = processing.run(
         "XDEM:Slope",
         {
-            "DEM": ref_dem_layer,
-            "SURFACE_FIT": "Florinsky",
-            "UNIT": "Degrees",
+            "INPUT": ref_dem_layer,
+            "surface_fit": 0,
+            "degrees": True,
             "OUTPUT": output_path,
         },
     )
@@ -55,13 +55,16 @@ def test_coreg(tba_dem_layer, ref_dem_layer, tmp_path):
     output_path = os.path.join(tmp_path, "test_coreg.tif")
 
     result = processing.run(
-        "XDEM:Coregistration",
+        "XDEM:Nuth Kääb (2011)",
         {
             "TBA_DEM": tba_dem_layer,
             "REF_DEM": ref_dem_layer,
             "MASK": None,
-            "METHOD": "Nuth and Kääb (2011)",
-            "BLOCKSIZE": None,
+            "BLOCKSIZE": 0,
+            "max_iterations": 10,
+            "offset_threshold": 0.001,
+            "bin_before_fit": True,
+            "vertical_shift": True,
             "OUTPUT": output_path,
         },
     )
