@@ -152,8 +152,8 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
         ref_dem_layer = self.parameterAsRasterLayer(parameters, "REF_DEM", context)
 
         # Extracting paths
-        tba_dem_path = tba_dem_layer.dataProvider().dataSourceUri()
-        ref_dem_path = ref_dem_layer.dataProvider().dataSourceUri()
+        tba_dem_path = tba_dem_layer.source()
+        ref_dem_path = ref_dem_layer.source()
 
         stats = self.parameterAsEnumStrings(parameters, "STATS", context)
         level = self.parameterAsInt(parameters, "LEVEL", context)
@@ -285,7 +285,7 @@ class TopoWorkflow(XdemProcessingAlgorithm):
         dem_layer = self.parameterAsRasterLayer(parameters, "DEM", context)
 
         # Extracting paths
-        dem_path = dem_layer.dataProvider().dataSourceUri()
+        dem_path = dem_layer.source()
 
         attributes = self.parameterAsEnumStrings(parameters, "ATTRIBUTES", context)
         stats = self.parameterAsEnumStrings(parameters, "STATS", context)

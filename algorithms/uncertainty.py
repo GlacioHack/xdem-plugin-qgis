@@ -73,15 +73,10 @@ class Heteroscedasticity(XdemProcessingAlgorithm):
         # Loading layers from QGIS
         aligned_dem_layer = self.parameterAsRasterLayer(parameters, "AL_DEM", context)
         ref_dem_layer = self.parameterAsRasterLayer(parameters, "REF_DEM", context)
-
-        # Extracting path
-        aligned_dem_path = aligned_dem_layer.dataProvider().dataSourceUri()
-        ref_dem_path = ref_dem_layer.dataProvider().dataSourceUri()
-
         output_path = self.parameterAsOutputLayer(parameters, "OUTPUT", context)
 
-        aligned_dem = xdem.DEM(aligned_dem_path)
-        ref_dem = xdem.DEM(ref_dem_path)
+        aligned_dem = xdem.DEM(aligned_dem_layer.source())
+        ref_dem = xdem.DEM(ref_dem_layer.source())
 
         # Creating a DEM difference object
         ddem = ref_dem - aligned_dem
