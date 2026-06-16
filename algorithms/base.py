@@ -67,18 +67,21 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
 
     def add_specific_parameters(self, func):
         """
-        Add all the parameters of a function into the QGIS UI
+        Scans the specified function and adds the parameters to QGIS based on their type.
         """
         function_signature = inspect.signature(func)
-        parameters_types = get_type_hints(func)
+
+        # Get the type of each param
+        parameter_types_dict = get_type_hints(func)
 
         for name, param in function_signature.parameters.items():
-            param_type = parameters_types.get(name, param.annotation)
+            param_type = parameter_types_dict.get(name)
 
             if name == "self":
                 continue
 
-            if name == "method":  # Deprecated, surface fit is used in place of
+            # Deprecated for terrain attributes but miss for ICP coreg
+            if name == "method":
                 continue
 
             elif param_type is bool:
@@ -113,17 +116,18 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
                     name=name,
                     description=name,
                     options=options,
-                    defaultValue=0,
+                    defaultValue=param.default,
                 )
                 self.add_advanced_param(parameter)
 
     def get_kwargs(self, func, parameters, context):
         """
-        Get all arguments entered into QGIS
+        Scans the specified function and convert all arguments entered into QGIS.
         """
         function_signature = inspect.signature(func)
         parameters_types = get_type_hints(func)
 
+        # Parameters saved in a keyword arguments dict
         kwargs = {}
 
         for name, param in function_signature.parameters.items():
@@ -132,7 +136,7 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
             if name == "self":
                 continue
 
-            if name == "method":  # Deprecated, surface fit is used in place of
+            if name == "method":
                 continue
 
             if param_type is bool:

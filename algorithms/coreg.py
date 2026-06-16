@@ -72,6 +72,7 @@ class Coreg(XdemProcessingAlgorithm):
 
         self.coreg_class = self.coreg_class()
 
+        # Add parameters specific to each coreg.__init__
         self.add_specific_parameters(self.coreg_class.__init__)
 
         self.addParameter(
@@ -81,6 +82,9 @@ class Coreg(XdemProcessingAlgorithm):
         )
 
     def coreg_info(self, feedback, coreg):
+        """
+        Capture the core.info output in order to display it in the log
+        """
         metadata = io.StringIO()
         with redirect_stdout(metadata):
             coreg.info()
@@ -101,8 +105,10 @@ class Coreg(XdemProcessingAlgorithm):
         else:
             inlier_mask = None
 
+        # Get all the specific settings entered in the UI
         kwargs = self.get_kwargs(self.coreg_class.__init__, parameters, context)
 
+        # Instantiate coreg with these parameters
         coreg = self.coreg_class(**kwargs)
 
         if block_size:

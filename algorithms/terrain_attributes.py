@@ -41,6 +41,7 @@ class TerrainAttributes(XdemProcessingAlgorithm):
 
         self.func = self.func()
 
+        # Add parameters specific to each attribute
         self.add_specific_parameters(self.func)
 
         self.addParameter(
