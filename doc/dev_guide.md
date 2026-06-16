@@ -6,7 +6,7 @@ This guide provide the detailed documentation for developers.
 xdem-plugin-qgis/
 ├── algorithms/
 │   ├── base.py
-│   ├── corrections.py
+│   ├── coreg.py
 │   ├── terrain_attributes.py
 │   ├── uncertainty.py
 │   ├── workflows.py
@@ -49,12 +49,19 @@ pytest.main(["plugin_directory/tests", "-v"])
 ```
 The tests will run just like a standard pytest execution, with progress updates and a final summary.
 
+Currently, there are three:
+- Terrain attributes
+- Coreg
+- Workflows
+These tests verify that the algorithms execute correctly and that their outputs are valid.
+
 ## Process algorithms
 Processing methods are divided into four categories, it's all in the `algorithms` folder.
-- **corrections**
-- **terrain attributes**
-- **uncertainty**
-- **workflows**
+- **Bias corrections**: For correction methods designed to correct both systematic elevation errors and spatially structured random errors.
+- **Coregistration**: For affine transformations, these can include vertical and horizontal translations, rotations and scalings.
+- **Terrain attributes**: To calculate derivatives of DEMs, such as curvatures.
+- **Uncertainty**: To visualise potential errors resulting from corrections.
+- **Workflows**: To run full pipelines and generate detailed reports.
 
 Before getting into the logic behind xDEM processing, it is important to understand how QGIS process algorithms works.
 
@@ -62,7 +69,7 @@ Every processing must inherit from the class `QgsProcessingAlgorithm`, it is the
 1. `initAlgorithm()` this method initialize the GUI, it explicitly specifies which parameters need to be entered for the algorithm to work.
 2. `processAlgorithm()` this method retrieves the parameters provided by the user and runs the process.
 
-The xdem algorithms follow this logic. Here is a simplified version of a slope processing:
+The xdem algorithms follow this logic. Here is a simplified version of the slope processing pipeline:
 ```python
 class Slope(QgsProcessingAlgorithm):
     def initAlgorithm()
@@ -80,7 +87,7 @@ class Slope(QgsProcessingAlgorithm):
         output_path = self.parameterAsOutputLayer(parameters, "OUTPUT")
 
         # Extracting the layer path
-        dem_path = dem_layer.dataProvider().dataSourceUri()
+        dem_path = dem_layer.source()
 
         # Convert to a DEM object
         dem = xdem.DEM(dem_path)
