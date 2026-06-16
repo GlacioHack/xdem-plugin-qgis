@@ -22,7 +22,7 @@ import os
 from qgis.core import QgsProcessingProvider
 from qgis.PyQt.QtGui import QIcon
 
-from .algorithms.corrections import *
+from .algorithms.coreg import *
 from .algorithms.terrain_attributes import *
 from .algorithms.uncertainty import *
 from .algorithms.workflows import *
@@ -36,9 +36,18 @@ class XdemProvider(QgsProcessingProvider):
         pass
 
     def loadAlgorithms(self):  # Displayed in QGIS in alphabetical order
-        # Corrections
-        self.addAlgorithm(BiasCorrection())
-        self.addAlgorithm(Coregistration())
+        # Coregistration
+        self.addAlgorithm(CPDCoreg())
+        self.addAlgorithm(DhMinimizeCoreg())
+        self.addAlgorithm(ICPCoreg())
+        self.addAlgorithm(LZDCoreg())
+        self.addAlgorithm(NuthKaabCoreg())
+        self.addAlgorithm(VerticalShift())
+
+        # Bias correction
+        self.addAlgorithm(DerampCoreg())
+        self.addAlgorithm(DirectionalBiasCoreg())
+        self.addAlgorithm(TerrainBiasCoreg())
 
         # Terrain attributes
         self.addAlgorithm(Aspect())
