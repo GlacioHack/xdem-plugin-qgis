@@ -132,6 +132,9 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
             if name == "self":
                 continue
 
+            if name == "method":  # Deprecated, surface fit is used in place of
+                continue
+
             if param_type is bool:
                 kwargs[name] = self.parameterAsBoolean(parameters, name, context)
 
