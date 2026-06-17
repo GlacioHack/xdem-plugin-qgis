@@ -17,7 +17,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import inspect
 import os
 from typing import Literal, get_args, get_origin, get_type_hints
@@ -69,19 +68,17 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
         """
         Scans the specified function and adds the parameters to QGIS based on their type.
         """
+        # Function signature
         function_signature = inspect.signature(func)
 
-        # Get the type of each param
+        # Dict of the each param type
         parameter_types_dict = get_type_hints(func)
 
         for name, param in function_signature.parameters.items():
+            # Get the type corresponding to the name
             param_type = parameter_types_dict.get(name)
 
-            if name == "self":
-                continue
-
-            # Deprecated for terrain attributes but miss for ICP coreg
-            if name == "method":
+            if name == "method":  # Deprecated
                 continue
 
             elif param_type is bool:
@@ -124,19 +121,20 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
         """
         Scans the specified function and convert all arguments entered into QGIS.
         """
+        # Function signature
         function_signature = inspect.signature(func)
-        parameters_types = get_type_hints(func)
+
+        # Dict of the each param type
+        parameter_types_dict = get_type_hints(func)
 
         # Parameters saved in a keyword arguments dict
         kwargs = {}
 
         for name, param in function_signature.parameters.items():
-            param_type = parameters_types.get(name, param.annotation)
+            # Get the type corresponding to the name
+            param_type = parameter_types_dict.get(name, param.annotation)
 
-            if name == "self":
-                continue
-
-            if name == "method":
+            if name == "method":  # Deprecated
                 continue
 
             if param_type is bool:

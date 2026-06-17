@@ -105,7 +105,7 @@ class Coreg(XdemProcessingAlgorithm):
         else:
             inlier_mask = None
 
-        # Get all the specific settings entered in the UI
+        # Get all the specific parameters entered in the UI
         kwargs = self.get_kwargs(self.coreg_class.__init__, parameters, context)
 
         # Instantiate coreg with these parameters

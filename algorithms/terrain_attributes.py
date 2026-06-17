@@ -57,10 +57,11 @@ class TerrainAttributes(XdemProcessingAlgorithm):
 
         dem = xdem.DEM(dem_layer.source())
 
+        # Get all the specific parameters entered in the UI
         kwargs = self.get_kwargs(self.func, parameters, context)
 
-        attribute_func = getattr(dem, self.func.__name__)
-        attribute = attribute_func(**kwargs)
+        # Instantiate attribute with these parameters
+        attribute = self.func(dem, **kwargs)
 
         attribute.to_file(output_path)
 
