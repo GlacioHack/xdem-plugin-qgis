@@ -197,7 +197,7 @@ class ProfileCurvature(TerrainAttributes):
         return xdem.DEM.profile_curvature
 
     def name(self):
-        return "Flowline curvature"
+        return "Profile curvature"
 
     def createInstance(self):
         return ProfileCurvature()
