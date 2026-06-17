@@ -28,8 +28,8 @@ xdem-plugin-qgis/
 
 ## Developement environment
 For developers, use `git clone` for installation, here are the steps: 
-1. Locate the `plugins` directory where QGIS stores its installed plugins, corresponding to your current profile.
-    - Go to `Settings` > `User profiles` > `Open active profile folder`, from there, go to `python` > `plugins`.
+1. Start QGIS and locate the `plugins` directory, corresponding to your current profile.
+    - Go to `Settings` > `User profiles` > `Open active profile folder` > `python` > `plugins`.
 2. Use `git clone https://github.com/GlacioHack/xdem-plugin-qgis.git` to install the xDEM plugin in this folder.
 3. Restart QGIS.
 4. Open the plugins menu and check the box to enable xDEM.
