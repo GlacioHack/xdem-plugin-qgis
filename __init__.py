@@ -32,4 +32,4 @@ def classFactory(iface):
         return XdemPlugin()
 
     else:
-        raise Exception("Unable to load the xDEM plugin, check the logs")
+        raise Exception("Unable to load xdem, check the logs")

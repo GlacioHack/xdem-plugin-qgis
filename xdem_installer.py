@@ -19,15 +19,19 @@
 
 
 import importlib
-import importlib.metadata
 import os
 import shutil
 import sys
 
-import requests
-from packaging.requirements import Requirement
 from pip._internal.cli.main import main as pip_main
 from qgis.core import Qgis, QgsMessageLog
+
+
+def log(message):
+    """
+    Displays information in the QGIS console, in the xDEM section.
+    """
+    QgsMessageLog.logMessage(message, "xDEM", Qgis.MessageLevel.Info)
 
 
 class XdemInstaller:
@@ -44,7 +48,6 @@ class XdemInstaller:
             "matplotlib",  # for worklfows plots
             "pytest",  # for tests
             "scikit-learn",  # for blockwise coreg
-            "laspy[lazrs]",  # for EPC support
             "xdem",
         ]
 
@@ -56,18 +59,6 @@ class XdemInstaller:
             "rasterio",
             "shapely",
         ]
-
-    def log(self, message, critical=False, warning=False):
-        """
-        Displays information in the QGIS console, in the xDEM section.
-        """
-        level = Qgis.MessageLevel.Info
-        if critical:
-            level = Qgis.MessageLevel.Critical
-        elif warning:
-            level = Qgis.MessageLevel.Warning
-
-        QgsMessageLog.logMessage(message, "xDEM", level)
 
     def exist_in_qgis(self, package):
         """
@@ -94,6 +85,7 @@ class XdemInstaller:
                     "pypi.org",
                 ]
             )
+        self.clean_shared_packages()
 
     def clean_shared_packages(self):
         """
@@ -106,32 +98,6 @@ class XdemInstaller:
                         target_package = os.path.join(self.deps_dir, xdem_package)
                         shutil.rmtree(target_package)
 
-    def download_requirements(self):
-        """
-        Download the xdem requirements file.
-        """
-        url = "https://raw.githubusercontent.com/GlacioHack/xdem/main/requirements.txt"
-        requirements = requests.get(url).text
-        return requirements
-
-    def check_dependencies(self):
-        """
-        Check if the environment satisfies the requirements.
-        """
-        try:
-            requirements = self.download_requirements()
-            for line in requirements.splitlines():
-                if not line or line.startswith("#"):
-                    continue
-                req = Requirement(line)
-                installed_version = importlib.metadata.version(req.name)
-                if installed_version not in req.specifier:
-                    return False
-            return True
-        except Exception as e:
-            self.log(f"Unable to check requirements: {e}", warning=True)
-            return True  # If requirements can't be checked, it return True but with a warning in the logs
-
     def set_proj_gdal_env(self):
         """
         Search for and set geoutils (rasterio) gdal and proj config.
@@ -142,7 +108,6 @@ class XdemInstaller:
             if "rasterio" in root:
                 if "proj.db" in files:
                     os.environ["PROJ_DATA"] = root
-
                 if "gdal_data" in dirs:
                     os.environ["GDAL_DATA"] = os.path.join(root, "gdal_data")
 
@@ -152,9 +117,7 @@ class XdemInstaller:
         """
         # Python check, xdem works starting with version 3.10
         if sys.version_info < (3, 10):
-            self.log(
-                "Installation failed, python version lower than 3.10", critical=True
-            )
+            log("Installation failed, python version lower than 3.10")
             return False
 
         # Installing packages and managing conflicts
@@ -162,10 +125,8 @@ class XdemInstaller:
             try:
                 os.makedirs(self.deps_dir, exist_ok=True)
                 self.install_packages()
-                self.clean_shared_packages()
             except Exception as e:
-                shutil.rmtree(self.deps_dir)
-                self.log(f"Installation failed, error:{e}", critical=True)
+                log(f"Installation failed, error:{e}")
                 return False
 
         # Add libs folder to the python path and initialize the proj and gdal data
@@ -173,15 +134,10 @@ class XdemInstaller:
             sys.path.insert(0, self.deps_dir)
             self.set_proj_gdal_env()
 
-        if not self.check_dependencies():
-            shutil.rmtree(self.deps_dir)
-            self.log("Installation failed, requirements unsatisfied", critical=True)
-            return False
-
         if not self.exist_in_qgis("xdem"):
             shutil.rmtree(self.deps_dir)
-            self.log("Installation failed, unable to import xdem", critical=True)
+            log("Installation failed, unable to import xdem")
             return False
 
-        self.log("Dependencies loaded successfully")
+        log("Dependencies loaded successfully")
         return True
