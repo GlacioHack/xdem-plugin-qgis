@@ -55,7 +55,7 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
     def tr(self, string):
         return QCoreApplication.translate("Processing", string)
 
-    def add_advanced_param(self, parameter):
+    def advanced_param(self, parameter):
         """
         Specify in QGIS that this setting is located in the Advanced section
         """
@@ -64,7 +64,7 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
         )
         self.addParameter(parameter)
 
-    def add_specific_parameters(self, func):
+    def add_parameters(self, func):
         """
         Scans the specified function and adds the parameters to QGIS based on their type.
         """
@@ -87,7 +87,7 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
                     description=name,
                     defaultValue=param.default,
                 )
-                self.add_advanced_param(parameter)
+                self.advanced_param(parameter)
 
             elif param_type is int:
                 parameter = QgsProcessingParameterNumber(
@@ -96,7 +96,7 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
                     type=QgsProcessingParameterNumber.Integer,
                     defaultValue=param.default,
                 )
-                self.add_advanced_param(parameter)
+                self.advanced_param(parameter)
 
             elif param_type is float:
                 parameter = QgsProcessingParameterNumber(
@@ -105,7 +105,7 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
                     type=QgsProcessingParameterNumber.Double,
                     defaultValue=param.default,
                 )
-                self.add_advanced_param(parameter)
+                self.advanced_param(parameter)
 
             elif get_origin(param_type) is Literal:
                 options = list(get_args(param_type))
@@ -115,7 +115,7 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
                     options=options,
                     defaultValue=param.default,
                 )
-                self.add_advanced_param(parameter)
+                self.advanced_param(parameter)
 
     def get_kwargs(self, func, parameters, context):
         """

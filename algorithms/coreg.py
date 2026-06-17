@@ -68,12 +68,12 @@ class Coreg(XdemProcessingAlgorithm):
                 type=QgsProcessingParameterNumber.Integer,
                 defaultValue=None,
             )
-            self.add_advanced_param(parameter)
+            self.advanced_param(parameter)
 
         self.coreg_class = self.coreg_class()
 
         # Add parameters specific to each coreg.__init__
-        self.add_specific_parameters(self.coreg_class.__init__)
+        self.add_parameters(self.coreg_class.__init__)
 
         self.addParameter(
             QgsProcessingParameterRasterDestination(

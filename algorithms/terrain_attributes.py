@@ -42,7 +42,7 @@ class TerrainAttributes(XdemProcessingAlgorithm):
         self.func = self.func()
 
         # Add parameters specific to each attribute
-        self.add_specific_parameters(self.func)
+        self.add_parameters(self.func)
 
         self.addParameter(
             QgsProcessingParameterRasterDestination(
@@ -197,7 +197,7 @@ class ProfileCurvature(TerrainAttributes):
         return xdem.DEM.profile_curvature
 
     def name(self):
-        return "Flowline curvature"
+        return "Profile curvature"
 
     def createInstance(self):
         return ProfileCurvature()
