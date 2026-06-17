@@ -18,18 +18,8 @@
 # limitations under the License.
 
 
+from .xdem_installer import XdemLoader
+
+
 def classFactory(iface):
-
-    # Initialization, verification of the installation before starting the plugin
-
-    from .xdem_installer import XdemInstaller
-
-    installer = XdemInstaller()
-
-    if installer.run():
-        from .xdem_plugin import XdemPlugin
-
-        return XdemPlugin()
-
-    else:
-        raise Exception("Unable to load the xDEM plugin, check the logs")
+    return XdemLoader()

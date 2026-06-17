@@ -19,23 +19,55 @@
 
 
 import importlib
-import importlib.metadata
 import os
 import shutil
 import sys
 
-import requests
-from packaging.requirements import Requirement
 from pip._internal.cli.main import main as pip_main
 from qgis.core import Qgis, QgsMessageLog
+from qgis.PyQt.QtCore import QThread, pyqtSignal
 
 
-class XdemInstaller:
+def log(message):
+    """
+    Displays information in the QGIS console, in the xDEM section.
+    """
+    QgsMessageLog.logMessage(message, "xDEM", Qgis.MessageLevel.Info)
+
+
+class XdemLoader:
+    def initGui(self):
+        self.thread = XdemInstaller()
+        self.thread.finished.connect(self._on_finished)
+        self.thread.start()
+
+    def _on_finished(self, success):
+        if not success:
+            return
+
+        log("xdem dependencies loaded successfully")
+        from .xdem_plugin import XdemPlugin
+
+        self.plugin = XdemPlugin()
+        self.plugin.initGui()
+
+    def unload(self):
+        if self.thread and self.thread.isRunning():
+            self.thread.quit()
+            self.thread.wait()
+        if self.plugin:
+            self.plugin.unload()
+
+
+class XdemInstaller(QThread):
     """
     The xdem python installer.
     """
 
+    finished = pyqtSignal(bool)
+
     def __init__(self):
+        super().__init__()
         self.plugin_dir = os.path.dirname(__file__)
         self.deps_dir = os.path.join(self.plugin_dir, "xdem_dependencies")
 
@@ -44,7 +76,6 @@ class XdemInstaller:
             "matplotlib",  # for worklfows plots
             "pytest",  # for tests
             "scikit-learn",  # for blockwise coreg
-            "laspy[lazrs]",  # for EPC support
             "xdem",
         ]
 
@@ -56,18 +87,6 @@ class XdemInstaller:
             "rasterio",
             "shapely",
         ]
-
-    def log(self, message, critical=False, warning=False):
-        """
-        Displays information in the QGIS console, in the xDEM section.
-        """
-        level = Qgis.MessageLevel.Info
-        if critical:
-            level = Qgis.MessageLevel.Critical
-        elif warning:
-            level = Qgis.MessageLevel.Warning
-
-        QgsMessageLog.logMessage(message, "xDEM", level)
 
     def exist_in_qgis(self, package):
         """
@@ -106,32 +125,6 @@ class XdemInstaller:
                         target_package = os.path.join(self.deps_dir, xdem_package)
                         shutil.rmtree(target_package)
 
-    def download_requirements(self):
-        """
-        Download the xdem requirements file.
-        """
-        url = "https://raw.githubusercontent.com/GlacioHack/xdem/main/requirements.txt"
-        requirements = requests.get(url).text
-        return requirements
-
-    def check_dependencies(self):
-        """
-        Check if the environment satisfies the requirements.
-        """
-        try:
-            requirements = self.download_requirements()
-            for line in requirements.splitlines():
-                if not line or line.startswith("#"):
-                    continue
-                req = Requirement(line)
-                installed_version = importlib.metadata.version(req.name)
-                if installed_version not in req.specifier:
-                    return False
-            return True
-        except Exception as e:
-            self.log(f"Unable to check requirements: {e}", warning=True)
-            return True  # If requirements can't be checked, it return True but with a warning in the logs
-
     def set_proj_gdal_env(self):
         """
         Search for and set geoutils (rasterio) gdal and proj config.
@@ -150,38 +143,33 @@ class XdemInstaller:
         """
         Check if xdem is already installed, if not it proceed with the install.
         """
+        result = True
         # Python check, xdem works starting with version 3.10
         if sys.version_info < (3, 10):
-            self.log(
-                "Installation failed, python version lower than 3.10", critical=True
-            )
-            return False
+            log("Python version lower than 3.10")
+            result is False
 
         # Installing packages and managing conflicts
         if not os.path.isdir(self.deps_dir):
             try:
+                log("Installing xdem dependencies...")
                 os.makedirs(self.deps_dir, exist_ok=True)
                 self.install_packages()
                 self.clean_shared_packages()
             except Exception as e:
-                shutil.rmtree(self.deps_dir)
-                self.log(f"Installation failed, error:{e}", critical=True)
-                return False
+                log(f"Error during installation of xdem: {e}")
+                result is False
 
-        # Add libs folder to the python path and initialize the proj and gdal data
+        # Add libs folder to the python path and init the proj and gdal data
         if self.deps_dir not in sys.path:
             sys.path.insert(0, self.deps_dir)
             self.set_proj_gdal_env()
 
-        if not self.check_dependencies():
-            shutil.rmtree(self.deps_dir)
-            self.log("Installation failed, requirements unsatisfied", critical=True)
-            return False
-
         if not self.exist_in_qgis("xdem"):
-            shutil.rmtree(self.deps_dir)
-            self.log("Installation failed, unable to import xdem", critical=True)
-            return False
+            log("Unable to load xDEM after installation")
+            result is False
 
-        self.log("Dependencies loaded successfully")
-        return True
+        if result is False:
+            shutil.rmtree(self.deps_dir)
+
+        self.finished.emit(result)
