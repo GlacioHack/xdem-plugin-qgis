@@ -5,7 +5,7 @@ This plugin allows you to perform processing on Digital Elevation Models (DEMs),
 For now, the plugin hasn't been released on QGIS, but you can already install it, here are the installation steps:
 1. Locate the `plugins` directory where QGIS stores its installed plugins, corresponding to your current profile.
     - Go to `Settings` > `User profiles` > `Open active profile folder` > `python` > `plugins`.
-2. Use `git clone https://github.com/GlacioHack/xdem-plugin-qgis.git` to install the xDEM plugin in this folder.
+2. Use `git clone https://github.com/GlacioHack/xdem-plugin-qgis.git` to install the plugin in this folder.
 3. Restart QGIS.
 4. Open the plugins menu and check the box to enable xDEM.
 
