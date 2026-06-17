@@ -25,7 +25,6 @@ import sys
 
 from pip._internal.cli.main import main as pip_main
 from qgis.core import Qgis, QgsMessageLog
-from qgis.PyQt.QtCore import QThread, pyqtSignal
 
 
 def log(message):
@@ -35,39 +34,12 @@ def log(message):
     QgsMessageLog.logMessage(message, "xDEM", Qgis.MessageLevel.Info)
 
 
-class XdemLoader:
-    def initGui(self):
-        self.thread = XdemInstaller()
-        self.thread.finished.connect(self._on_finished)
-        self.thread.start()
-
-    def _on_finished(self, success):
-        if not success:
-            return
-
-        log("xdem dependencies loaded successfully")
-        from .xdem_plugin import XdemPlugin
-
-        self.plugin = XdemPlugin()
-        self.plugin.initGui()
-
-    def unload(self):
-        if self.thread and self.thread.isRunning():
-            self.thread.quit()
-            self.thread.wait()
-        if self.plugin:
-            self.plugin.unload()
-
-
-class XdemInstaller(QThread):
+class XdemInstaller:
     """
     The xdem python installer.
     """
 
-    finished = pyqtSignal(bool)
-
     def __init__(self):
-        super().__init__()
         self.plugin_dir = os.path.dirname(__file__)
         self.deps_dir = os.path.join(self.plugin_dir, "xdem_dependencies")
 
@@ -125,6 +97,9 @@ class XdemInstaller(QThread):
                         target_package = os.path.join(self.deps_dir, xdem_package)
                         shutil.rmtree(target_package)
 
+        # Clean the shared packages after the full install
+        self.clean_shared_packages()
+
     def set_proj_gdal_env(self):
         """
         Search for and set geoutils (rasterio) gdal and proj config.
@@ -143,11 +118,10 @@ class XdemInstaller(QThread):
         """
         Check if xdem is already installed, if not it proceed with the install.
         """
-        result = True
         # Python check, xdem works starting with version 3.10
         if sys.version_info < (3, 10):
             log("Python version lower than 3.10")
-            result = False
+            return False
 
         # Installing packages and managing conflicts
         if not os.path.isdir(self.deps_dir):
@@ -155,10 +129,9 @@ class XdemInstaller(QThread):
                 log("Installing xdem dependencies...")
                 os.makedirs(self.deps_dir, exist_ok=True)
                 self.install_packages()
-                self.clean_shared_packages()
             except Exception as e:
                 log(f"Error during installation of xdem: {e}")
-                result = False
+                return False
 
         # Add libs folder to the python path and init the proj and gdal data
         if self.deps_dir not in sys.path:
@@ -167,9 +140,8 @@ class XdemInstaller(QThread):
 
         if not self.exist_in_qgis("xdem"):
             log("Unable to load xDEM after installation")
-            result = False
-
-        if result is False:
             shutil.rmtree(self.deps_dir)
+            return False
 
-        self.finished.emit(result)
+        log("Dependencies loaded successfully")
+        return True

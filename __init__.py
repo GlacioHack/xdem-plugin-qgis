@@ -19,6 +19,11 @@
 
 
 def classFactory(iface):
-    from .xdem_installer import XdemLoader
+    from .xdem_installer import XdemInstaller
 
-    return XdemLoader()
+    installer = XdemInstaller()
+
+    if installer.run():
+        from .xdem_plugin import XdemPlugin
+
+        return XdemPlugin()
