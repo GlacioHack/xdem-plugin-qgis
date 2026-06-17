@@ -147,7 +147,7 @@ class XdemInstaller(QThread):
         # Python check, xdem works starting with version 3.10
         if sys.version_info < (3, 10):
             log("Python version lower than 3.10")
-            result is False
+            result = False
 
         # Installing packages and managing conflicts
         if not os.path.isdir(self.deps_dir):
@@ -158,7 +158,7 @@ class XdemInstaller(QThread):
                 self.clean_shared_packages()
             except Exception as e:
                 log(f"Error during installation of xdem: {e}")
-                result is False
+                result = False
 
         # Add libs folder to the python path and init the proj and gdal data
         if self.deps_dir not in sys.path:
@@ -167,7 +167,7 @@ class XdemInstaller(QThread):
 
         if not self.exist_in_qgis("xdem"):
             log("Unable to load xDEM after installation")
-            result is False
+            result = False
 
         if result is False:
             shutil.rmtree(self.deps_dir)

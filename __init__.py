@@ -18,8 +18,7 @@
 # limitations under the License.
 
 
-from .xdem_installer import XdemLoader
-
-
 def classFactory(iface):
+    from .xdem_installer import XdemLoader
+
     return XdemLoader()
