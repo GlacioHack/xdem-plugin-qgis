@@ -44,11 +44,11 @@ class XdemInstaller:
         self.deps_dir = os.path.join(self.plugin_dir, "xdem_dependencies")
 
         self.required_packages = [
+            "xdem",
             "cerberus",  # for worklfows
             "matplotlib",  # for worklfows plots
             "pytest",  # for tests
             "scikit-learn",  # for blockwise coreg
-            "xdem",
         ]
 
         self.shared_packages = [
