@@ -17,6 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 import inspect
 import os
 from typing import Literal, get_args, get_origin, get_type_hints
@@ -64,9 +65,9 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
         )
         self.addParameter(parameter)
 
-    def add_parameters(self, func):
+    def generate_parameters(self, func):
         """
-        Scans the specified function and adds the parameters to QGIS based on their type.
+        Scans the specified function and generate the parameters in QGIS based on their type.
         """
         # Function signature
         function_signature = inspect.signature(func)

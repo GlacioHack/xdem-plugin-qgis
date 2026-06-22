@@ -37,12 +37,12 @@ class XdemProvider(QgsProcessingProvider):
 
     def loadAlgorithms(self):  # Displayed in QGIS in alphabetical order
         # Coregistration
-        self.addAlgorithm(CPDCoreg())
+        # self.addAlgorithm(CPDCoreg())
         self.addAlgorithm(DhMinimizeCoreg())
         self.addAlgorithm(ICPCoreg())
         self.addAlgorithm(LZDCoreg())
         self.addAlgorithm(NuthKaabCoreg())
-        self.addAlgorithm(VerticalShift())
+        self.addAlgorithm(VerticalShiftCoreg())
 
         # Bias correction
         self.addAlgorithm(DerampCoreg())

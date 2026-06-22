@@ -34,26 +34,26 @@ class TerrainAttributes(XdemProcessingAlgorithm):
         """
         self.addParameter(
             QgsProcessingParameterRasterLayer(
-                name="INPUT",
+                name="dem",
                 description="DEM",
             )
         )
 
         self.func = self.func()
 
-        # Add parameters specific to each attribute
-        self.add_parameters(self.func)
+        # Generate parameters specific to each attribute
+        self.generate_parameters(self.func)
 
         self.addParameter(
             QgsProcessingParameterRasterDestination(
-                name="OUTPUT",
+                name="output",
                 description=self.name(),
             )
         )
 
     def processAlgorithm(self, parameters, context, feedback):
-        dem_layer = self.parameterAsRasterLayer(parameters, "INPUT", context)
-        output_path = self.parameterAsOutputLayer(parameters, "OUTPUT", context)
+        dem_layer = self.parameterAsRasterLayer(parameters, "dem", context)
+        output_path = self.parameterAsOutputLayer(parameters, "output", context)
 
         dem = xdem.DEM(dem_layer.source())
 
@@ -65,7 +65,7 @@ class TerrainAttributes(XdemProcessingAlgorithm):
 
         attribute.to_file(output_path)
 
-        return {"OUTPUT": output_path}
+        return {"output": output_path}
 
     def groupId(self):
         return "Terrain attributes"

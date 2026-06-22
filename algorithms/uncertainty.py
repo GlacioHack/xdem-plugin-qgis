@@ -18,6 +18,7 @@
 # limitations under the License.
 
 
+import geoutils as gu
 import xdem
 from qgis.core import (
     QgsProcessingParameterRasterDestination,
@@ -42,46 +43,50 @@ class Heteroscedasticity(XdemProcessingAlgorithm):
         """
         self.addParameter(
             QgsProcessingParameterRasterLayer(
-                name="AL_DEM",
+                name="al_dem",
                 description="Aligned DEM",
             )
         )
 
         self.addParameter(
             QgsProcessingParameterRasterLayer(
-                name="REF_DEM",
+                name="ref_dem",
                 description="Reference DEM",
             )
         )
 
         self.addParameter(
             QgsProcessingParameterRasterLayer(
-                name="MASK",
+                name="mask",
                 description="Stable terrain mask",
-                defaultValue=None,
+                optional=True,
             )
         )
 
         self.addParameter(
             QgsProcessingParameterRasterDestination(
-                name="OUTPUT",
+                name="output",
                 description="Map of variable error",
             )
         )
 
     def processAlgorithm(self, parameters, context, feedback):
         # Loading layers from QGIS
-        aligned_dem_layer = self.parameterAsRasterLayer(parameters, "AL_DEM", context)
-        ref_dem_layer = self.parameterAsRasterLayer(parameters, "REF_DEM", context)
-        output_path = self.parameterAsOutputLayer(parameters, "OUTPUT", context)
+        al_dem_layer = self.parameterAsRasterLayer(parameters, "al_dem", context)
+        ref_dem_layer = self.parameterAsRasterLayer(parameters, "ref_dem", context)
+        stable_terrain_layer = self.parameterAsRasterLayer(parameters, "mask", context)
+        output_path = self.parameterAsOutputLayer(parameters, "output", context)
 
-        aligned_dem = xdem.DEM(aligned_dem_layer.source())
+        aligned_dem = xdem.DEM(al_dem_layer.source())
         ref_dem = xdem.DEM(ref_dem_layer.source())
 
         # Creating a DEM difference object
         ddem = ref_dem - aligned_dem
 
-        stable_terrain = self.load_mask(parameters, context, feedback)
+        if stable_terrain_layer:
+            stable_terrain = gu.Raster(stable_terrain_layer.source(), is_mask=True)
+        else:
+            stable_terrain = None
 
         # Run the pipeline with slope and max curvature
         slope, max_curvature = xdem.terrain.get_terrain_attribute(
@@ -98,7 +103,7 @@ class Heteroscedasticity(XdemProcessingAlgorithm):
 
         error_map.to_file(output_path)
 
-        return {"OUTPUT": output_path}
+        return {"output": output_path}
 
     def name(self):
         return "Heteroscedasticity"

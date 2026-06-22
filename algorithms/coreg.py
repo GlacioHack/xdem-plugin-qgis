@@ -40,21 +40,21 @@ class Coreg(XdemProcessingAlgorithm):
         """
         self.addParameter(
             QgsProcessingParameterRasterLayer(
-                name="TBA_DEM",
+                name="tba_dem",
                 description="To be aligned DEM",
             )
         )
 
         self.addParameter(
             QgsProcessingParameterRasterLayer(
-                name="REF_DEM",
+                name="ref_dem",
                 description="Reference DEM",
             )
         )
 
         self.addParameter(
             QgsProcessingParameterRasterLayer(
-                name="MASK",
+                name="mask",
                 description="Inlier mask",
                 optional=True,
             )
@@ -63,7 +63,7 @@ class Coreg(XdemProcessingAlgorithm):
         # Blockwise only for coregistration
         if self.groupId() == "Coregistration":
             parameter = QgsProcessingParameterNumber(
-                name="BLOCKSIZE",
+                name="blocksize",
                 description="blocksize",
                 type=QgsProcessingParameterNumber.Integer,
                 defaultValue=None,
@@ -72,18 +72,18 @@ class Coreg(XdemProcessingAlgorithm):
 
         self.coreg_class = self.coreg_class()
 
-        # Add parameters specific to each coreg.__init__
-        self.add_parameters(self.coreg_class.__init__)
+        # Generate parameters specific to each coreg init
+        self.generate_parameters(self.coreg_class.__init__)
 
         self.addParameter(
             QgsProcessingParameterRasterDestination(
-                name="OUTPUT", description=(f"Output - {self.name()}")
+                name="output", description=(f"Output - {self.name()}")
             )
         )
 
     def coreg_info(self, feedback, coreg):
         """
-        Capture the core.info output in order to display it in the log
+        Capture the core.info output and display it in the log
         """
         metadata = io.StringIO()
         with redirect_stdout(metadata):
@@ -91,16 +91,16 @@ class Coreg(XdemProcessingAlgorithm):
         feedback.pushInfo(metadata.getvalue())
 
     def processAlgorithm(self, parameters, context, feedback):
-        tba_layer = self.parameterAsRasterLayer(parameters, "TBA_DEM", context)
-        ref_layer = self.parameterAsRasterLayer(parameters, "REF_DEM", context)
-        inlier_mask_layer = self.parameterAsRasterLayer(parameters, "MASK", context)
-        block_size = self.parameterAsInt(parameters, "BLOCKSIZE", context)
-        output_path = self.parameterAsOutputLayer(parameters, "OUTPUT", context)
+        tba_layer = self.parameterAsRasterLayer(parameters, "tba_dem", context)
+        ref_layer = self.parameterAsRasterLayer(parameters, "ref_dem", context)
+        inlier_mask_layer = self.parameterAsRasterLayer(parameters, "mask", context)
+        block_size = self.parameterAsInt(parameters, "blocksize", context)
+        output_path = self.parameterAsOutputLayer(parameters, "output", context)
 
         ref_dem = xdem.DEM(ref_layer.source())
         tba_dem = xdem.DEM(tba_layer.source())
 
-        if inlier_mask_layer is not None:
+        if inlier_mask_layer:
             inlier_mask = gu.Raster(inlier_mask_layer.source(), is_mask=True)
         else:
             inlier_mask = None
@@ -137,7 +137,7 @@ class Coreg(XdemProcessingAlgorithm):
 
         aligned_dem.to_file(output_path)
 
-        return {"OUTPUT": output_path}
+        return {"output": output_path}
 
 
 # Coregistration
@@ -211,7 +211,7 @@ class NuthKaabCoreg(Coreg):
         return NuthKaabCoreg()
 
 
-class VerticalShift(Coreg):
+class VerticalShiftCoreg(Coreg):
     def coreg_class(self):
         return xdem.coreg.VerticalShift
 
@@ -222,7 +222,7 @@ class VerticalShift(Coreg):
         return "Coregistration"
 
     def createInstance(self):
-        return VerticalShift()
+        return VerticalShiftCoreg()
 
 
 # Bias correction

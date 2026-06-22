@@ -36,15 +36,14 @@ from .base import XdemProcessingAlgorithm
 COREG_METHODS = COREG_METHODS[:-1]  # Squeeze the last value (None)
 
 
-def add_layers_to_project(add_layers, output_folder):
+def add_layers_to_project(output_folder):
     """
     Add the workflow output layers to the current project
     """
-    if add_layers:
-        rasters_folder = os.path.join(output_folder, "rasters")
-        for file in os.listdir(rasters_folder):
-            file_path = os.path.join(rasters_folder, file)
-            iface.addRasterLayer(file_path)
+    rasters_folder = os.path.join(output_folder, "rasters")
+    for file in os.listdir(rasters_folder):
+        file_path = os.path.join(rasters_folder, file)
+        iface.addRasterLayer(file_path)
 
 
 class AccuracyWorkflow(XdemProcessingAlgorithm):
@@ -65,21 +64,21 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
         """
         self.addParameter(
             QgsProcessingParameterRasterLayer(
-                name="TBA_DEM",
+                name="tba_dem",
                 description="To be aligned DEM",
             )
         )
 
         self.addParameter(
             QgsProcessingParameterRasterLayer(
-                name="REF_DEM",
+                name="ref_dem",
                 description="Reference DEM",
             )
         )
 
         self.addParameter(
             QgsProcessingParameterEnum(
-                name="STATS",
+                name="stats",
                 description="Statistics",
                 options=STATS_METHODS,
                 defaultValue=["min", "max", "mean", "median", "nmad"],
@@ -90,7 +89,7 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
 
         self.addParameter(
             QgsProcessingParameterEnum(
-                name="LEVEL",
+                name="level",
                 description="Level for detailed outputs",
                 options=["1", "2"],
                 defaultValue="2",
@@ -100,7 +99,7 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
 
         self.addParameter(
             QgsProcessingParameterBoolean(
-                name="ADD_LAYERS",
+                name="add_layers",
                 description="Add layers to project",
                 defaultValue=True,
             )
@@ -108,7 +107,7 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
 
         self.addParameter(
             QgsProcessingParameterEnum(
-                name="METHOD1",
+                name="method1",
                 description="Method - 1",
                 options=COREG_METHODS,
                 defaultValue="NuthKaab",
@@ -117,7 +116,7 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
         )
 
         parameter = QgsProcessingParameterEnum(
-            name="METHOD2",
+            name="method2",
             description="Method - 2",
             options=COREG_METHODS,
             optional=True,
@@ -129,7 +128,7 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
         self.addParameter(parameter)
 
         parameter = QgsProcessingParameterEnum(
-            name="METHOD3",
+            name="method3",
             description="Method - 3",
             options=COREG_METHODS,
             optional=True,
@@ -142,27 +141,27 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
 
         self.addParameter(
             QgsProcessingParameterFolderDestination(
-                name="OUTPUT", description="Accuracy folder"
+                name="output", description="Accuracy folder"
             )
         )
 
     def processAlgorithm(self, parameters, context, feedback):
         # Loading layers from QGIS
-        tba_dem_layer = self.parameterAsRasterLayer(parameters, "TBA_DEM", context)
-        ref_dem_layer = self.parameterAsRasterLayer(parameters, "REF_DEM", context)
+        tba_dem_layer = self.parameterAsRasterLayer(parameters, "tba_dem", context)
+        ref_dem_layer = self.parameterAsRasterLayer(parameters, "ref_dem", context)
 
         # Extracting paths
         tba_dem_path = tba_dem_layer.source()
         ref_dem_path = ref_dem_layer.source()
 
-        stats = self.parameterAsEnumStrings(parameters, "STATS", context)
-        level = self.parameterAsInt(parameters, "LEVEL", context)
-        add_layers = self.parameterAsBoolean(parameters, "ADD_LAYERS", context)
-        method1 = self.parameterAsString(parameters, "METHOD1", context)
-        method2 = self.parameterAsString(parameters, "METHOD2", context)
-        method3 = self.parameterAsString(parameters, "METHOD3", context)
+        stats = self.parameterAsEnumStrings(parameters, "stats", context)
+        level = self.parameterAsInt(parameters, "level", context)
+        add_layers = self.parameterAsBoolean(parameters, "add_layers", context)
+        method1 = self.parameterAsString(parameters, "method1", context)
+        method2 = self.parameterAsString(parameters, "method2", context)
+        method3 = self.parameterAsString(parameters, "method3", context)
 
-        output_folder = self.parameterAsString(parameters, "OUTPUT", context)
+        output_folder = self.parameterAsString(parameters, "output", context)
         os.makedirs(output_folder, exist_ok=True)
 
         # Configuration setup
@@ -181,15 +180,17 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
             },
             "coregistration": {
                 "step_one": {"method": method1},
-                "step_two": {"method": None if method2 == "" else method2},
-                "step_three": {"method": None if method3 == "" else method3},
+                "step_two": {"method": method2 if method2 else None},
+                "step_three": {"method": method3 if method3 else None},
             },
             "statistics": stats,
         }
 
         workflow = Accuracy(config)
         workflow.run()
-        add_layers_to_project(add_layers, output_folder)
+
+        if add_layers:
+            add_layers_to_project(output_folder)
 
         return {}
 
@@ -229,14 +230,14 @@ class TopoWorkflow(XdemProcessingAlgorithm):
         """
         self.addParameter(
             QgsProcessingParameterRasterLayer(
-                name="DEM",
+                name="dem",
                 description="DEM",
             )
         )
 
         self.addParameter(
             QgsProcessingParameterEnum(
-                name="ATTRIBUTES",
+                name="attributes",
                 description="Terrain attributes",
                 options=TERRAIN_ATTRIBUTES,
                 defaultValue=["slope", "aspect", "hillshade", "profile_curvature"],
@@ -247,7 +248,7 @@ class TopoWorkflow(XdemProcessingAlgorithm):
 
         self.addParameter(
             QgsProcessingParameterEnum(
-                name="STATS",
+                name="stats",
                 description="Statistics",
                 options=STATS_METHODS,
                 defaultValue=["min", "max", "mean", "median", "nmad"],
@@ -258,7 +259,7 @@ class TopoWorkflow(XdemProcessingAlgorithm):
 
         self.addParameter(
             QgsProcessingParameterEnum(
-                name="LEVEL",
+                name="level",
                 description="Level for detailed outputs",
                 options=["1", "2"],
                 defaultValue="2",
@@ -268,7 +269,7 @@ class TopoWorkflow(XdemProcessingAlgorithm):
 
         self.addParameter(
             QgsProcessingParameterBoolean(
-                name="ADD_LAYERS",
+                name="add_layers",
                 description="Add layers to project",
                 defaultValue=True,
             )
@@ -276,23 +277,23 @@ class TopoWorkflow(XdemProcessingAlgorithm):
 
         self.addParameter(
             QgsProcessingParameterFolderDestination(
-                name="OUTPUT", description="Topography folder"
+                name="output", description="Topography folder"
             )
         )
 
     def processAlgorithm(self, parameters, context, feedback):
         # Loading layers from QGIS
-        dem_layer = self.parameterAsRasterLayer(parameters, "DEM", context)
+        dem_layer = self.parameterAsRasterLayer(parameters, "dem", context)
 
         # Extracting paths
         dem_path = dem_layer.source()
 
-        attributes = self.parameterAsEnumStrings(parameters, "ATTRIBUTES", context)
-        stats = self.parameterAsEnumStrings(parameters, "STATS", context)
-        level = self.parameterAsInt(parameters, "LEVEL", context)
-        add_layers = self.parameterAsBoolean(parameters, "ADD_LAYERS", context)
+        attributes = self.parameterAsEnumStrings(parameters, "attributes", context)
+        stats = self.parameterAsEnumStrings(parameters, "stats", context)
+        level = self.parameterAsInt(parameters, "level", context)
+        add_layers = self.parameterAsBoolean(parameters, "add_layers", context)
 
-        output_folder = self.parameterAsString(parameters, "OUTPUT", context)
+        output_folder = self.parameterAsString(parameters, "output", context)
         os.makedirs(output_folder, exist_ok=True)
 
         # Configuration setup
@@ -310,7 +311,9 @@ class TopoWorkflow(XdemProcessingAlgorithm):
 
         workflow = Topo(config)
         workflow.run()
-        add_layers_to_project(add_layers, output_folder)
+
+        if add_layers:
+            add_layers_to_project(output_folder)
 
         return {}
 
