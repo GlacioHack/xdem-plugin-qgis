@@ -49,10 +49,11 @@ pytest.main(["plugin_directory/tests", "-v"])
 ```
 The tests will run just like a standard pytest execution, with progress updates and a final summary.
 
-Currently, there are three:
+Currently, there are 3 tests:
 - Terrain attributes
-- Coreg
+- Coregistration
 - Workflows
+
 These tests verify that the algorithms execute correctly and that their outputs are valid.
 
 ## Process algorithms
