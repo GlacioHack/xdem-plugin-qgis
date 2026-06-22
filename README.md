@@ -1,7 +1,7 @@
 # xDEM Plugin QGIS
 This plugin allows you to perform processing on Digital Elevation Models (DEMs), it is based on the xDEM Python package. It is developed in collaboration between CNES (the French space agency) and Glacio Hack (a group of glaciology researchers).
 
-# Installation
+## Installation
 For now, the plugin hasn't been released on QGIS, but you can already install it, here are the installation steps:
 1. Download the zip file from github
 2. In QGIS go to `Plugins` > `Manage and Install Plugins...` > `Install from ZIP`
