@@ -1,4 +1,4 @@
-# Copyright (c) 2026 xDEM developers
+# Copyright (c) 2026 Centre National d'Etudes Spatiales (CNES).
 #
 # This file is part of the xDEM project:
 # https://github.com/glaciohack/xdem
@@ -40,13 +40,13 @@ def test_terrain_attribute(ref_dem_layer, tmp_path):
     result = processing.run(
         "XDEM:Slope",
         {
-            "INPUT": ref_dem_layer,
+            "dem": ref_dem_layer,
             "surface_fit": 0,
             "degrees": True,
-            "OUTPUT": output_path,
+            "output": output_path,
         },
     )
-    output_layer = QgsRasterLayer(result["OUTPUT"])
+    output_layer = QgsRasterLayer(result["output"])
 
     check_layer(ref_dem_layer, output_layer)
 
@@ -57,18 +57,18 @@ def test_coreg(tba_dem_layer, ref_dem_layer, tmp_path):
     result = processing.run(
         "XDEM:Nuth Kääb (2011)",
         {
-            "TBA_DEM": tba_dem_layer,
-            "REF_DEM": ref_dem_layer,
-            "MASK": None,
-            "BLOCKSIZE": 0,
+            "tba_dem": tba_dem_layer,
+            "ref_dem": ref_dem_layer,
+            "mask": None,
+            "blocksize": 0,
             "max_iterations": 10,
             "offset_threshold": 0.001,
             "bin_before_fit": True,
             "vertical_shift": True,
-            "OUTPUT": output_path,
+            "output": output_path,
         },
     )
-    output_layer = QgsRasterLayer(result["OUTPUT"])
+    output_layer = QgsRasterLayer(result["output"])
 
     check_layer(ref_dem_layer, output_layer)
 
@@ -95,12 +95,12 @@ def test_workflow(ref_dem_layer, tmp_path):
     processing.run(
         "XDEM:Topography",
         {
-            "DEM": ref_dem_layer,
-            "ATTRIBUTES": attributes,
-            "STATS": ["min", "max", "mean", "median", "nmad"],
-            "LEVEL": "2",
-            "ADD_LAYERS": False,
-            "OUTPUT": output_folder,
+            "dem": ref_dem_layer,
+            "attributes": attributes,
+            "stats": ["min", "max", "mean", "median", "nmad"],
+            "level": "2",
+            "add_layers": False,
+            "output": output_folder,
         },
     )
     # Check if html was generated
