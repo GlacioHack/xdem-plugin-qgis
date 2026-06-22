@@ -39,10 +39,10 @@ class TerrainAttributes(XdemProcessingAlgorithm):
             )
         )
 
-        self.func = self.func()
+        self.xdem_func = self.func()
 
         # Generate parameters specific to each attribute
-        self.generate_parameters(self.func)
+        self.generate_parameters(self.xdem_func)
 
         self.addParameter(
             QgsProcessingParameterRasterDestination(
@@ -58,10 +58,10 @@ class TerrainAttributes(XdemProcessingAlgorithm):
         dem = xdem.DEM(dem_layer.source())
 
         # Get all the specific parameters entered in the UI
-        kwargs = self.get_kwargs(self.func, parameters, context)
+        kwargs = self.get_kwargs(self.xdem_func, parameters, context)
 
         # Instantiate attribute with these parameters
-        attribute = self.func(dem, **kwargs)
+        attribute = self.xdem_func(dem, **kwargs)
 
         attribute.to_file(output_path)
 

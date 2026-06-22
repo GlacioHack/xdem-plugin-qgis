@@ -70,10 +70,10 @@ class Coreg(XdemProcessingAlgorithm):
             )
             self.advanced_param(parameter)
 
-        self.coreg_class = self.coreg_class()
+        self.xdem_coreg = self.coreg_class()
 
         # Generate parameters specific to each coreg init
-        self.generate_parameters(self.coreg_class.__init__)
+        self.generate_parameters(self.xdem_coreg.__init__)
 
         self.addParameter(
             QgsProcessingParameterRasterDestination(
@@ -106,10 +106,10 @@ class Coreg(XdemProcessingAlgorithm):
             inlier_mask = None
 
         # Get all the specific parameters entered in the UI
-        kwargs = self.get_kwargs(self.coreg_class.__init__, parameters, context)
+        kwargs = self.get_kwargs(self.xdem_coreg.__init__, parameters, context)
 
         # Instantiate coreg with these parameters
-        coreg = self.coreg_class(**kwargs)
+        coreg = self.xdem_coreg(**kwargs)
 
         if block_size:
             blockwise = xdem.coreg.BlockwiseCoreg(

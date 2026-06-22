@@ -38,10 +38,6 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
     This class represents the base class from which all xDEM algorithms inherit.
     """
 
-    def flags(self):
-        # Multithreading is disabled to prevent memory conflicts
-        return super().flags() | QgsProcessingAlgorithm.FlagNoThreading
-
     def displayName(self):
         return self.tr(self.name())
 
