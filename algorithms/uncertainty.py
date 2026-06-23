@@ -53,7 +53,6 @@ class Heteroscedasticity(XdemProcessingAlgorithm):
             QgsProcessingParameterRasterLayer(
                 name="mask",
                 description="Stable terrain mask",
-                optional=True,
             )
         )
 
@@ -73,14 +72,10 @@ class Heteroscedasticity(XdemProcessingAlgorithm):
 
         aligned_dem = xdem.DEM(al_dem_layer.source())
         ref_dem = xdem.DEM(ref_dem_layer.source())
+        stable_terrain = gu.Raster(stable_terrain_layer.source(), is_mask=True)
 
         # Creating a DEM difference object
         ddem = ref_dem - aligned_dem
-
-        if stable_terrain_layer:
-            stable_terrain = gu.Raster(stable_terrain_layer.source(), is_mask=True)
-        else:
-            stable_terrain = None
 
         # Run the pipeline with slope and max curvature
         slope, max_curvature = xdem.terrain.get_terrain_attribute(
