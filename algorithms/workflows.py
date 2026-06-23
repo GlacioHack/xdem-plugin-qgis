@@ -52,16 +52,6 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
     """
 
     def initAlgorithm(self, config=None):
-        """
-        - param TBA_DEM: The DEM requiring correction.
-        - param REF_DEM: The reference DEM.
-        - param STATS: The requested statistics.
-        - param LEVEL: The level for detailed outputs.
-        - param METHOD1: The (first) coreg method.
-        - param METHOD2: If needed, a second method can be used to operate as a pipeline.
-        - param METHOD3: If needed, a third method can be used to operate as a pipeline.
-        - param OUTPUT: The results folder.
-        """
         self.addParameter(
             QgsProcessingParameterRasterLayer(
                 name="tba_dem",
@@ -221,13 +211,6 @@ class TopoWorkflow(XdemProcessingAlgorithm):
     """
 
     def initAlgorithm(self, config=None):
-        """
-        - param DEM: The concerned DEM.
-        - param ATTRIBUTES: The requested attributes
-        - param STATS: The requested statistics.
-        - param LEVEL: The level for detailed outputs.
-        - param OUTPUT: The results folder.
-        """
         self.addParameter(
             QgsProcessingParameterRasterLayer(
                 name="dem",

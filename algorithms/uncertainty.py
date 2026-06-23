@@ -35,12 +35,6 @@ class Heteroscedasticity(XdemProcessingAlgorithm):
     """
 
     def initAlgorithm(self, config=None):
-        """
-        - param AL_DEM: The aligned DEM.
-        - param REF_DEM: The reference DEM.
-        - param MASK: The mask corresponding to the stable terrain (0 for unstable, 1 for stable).
-        - param OUTPUT: The the error map.
-        """
         self.addParameter(
             QgsProcessingParameterRasterLayer(
                 name="al_dem",
