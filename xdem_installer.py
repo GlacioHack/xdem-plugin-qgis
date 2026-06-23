@@ -44,9 +44,10 @@ class XdemInstaller:
         self.deps_dir = os.path.join(self.plugin_dir, "xdem_dependencies")
 
         self.required_packages = [
+            "scipy==1.17 ",
+            "matplotlib==3.7",
             "pytest",
             "cerberus",
-            "matplotlib",
             "scikit-learn",
             "xdem",
         ]
