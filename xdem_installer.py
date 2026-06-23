@@ -44,20 +44,20 @@ class XdemInstaller:
         self.deps_dir = os.path.join(self.plugin_dir, "xdem_dependencies")
 
         self.required_packages = [
+            "pytest",
+            "cerberus",
+            "matplotlib",
+            "scikit-learn",
             "xdem",
-            "cerberus",  # for worklfows
-            "matplotlib",  # for worklfows plots
-            "pytest",  # for tests
-            "scikit-learn",  # for blockwise coreg
         ]
 
         self.shared_packages = [
-            "geopandas",
-            "numpy",
-            "pandas",
-            "pyproj",
             "rasterio",
+            "geopandas",
+            "pandas",
             "shapely",
+            "pyproj",
+            "numpy",
         ]
 
     def exist_in_qgis(self, package):
