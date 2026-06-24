@@ -18,6 +18,9 @@
 # limitations under the License.
 
 
+import shutil
+
+
 def classFactory(iface):
 
     # Initialization, verification of the installation before starting the plugin
@@ -32,4 +35,6 @@ def classFactory(iface):
         return XdemPlugin()
 
     else:
+        shutil.rmtree(installer.deps_dir)
+
         raise Exception("Unable to load xdem, check the logs")
