@@ -44,10 +44,10 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
         return super().flags() | QgsProcessingAlgorithm.FlagNoThreading
 
     def displayName(self):
-        return self.tr(self.name())
+        return self.name()
 
     def group(self):
-        return self.tr(self.groupId())
+        return self.groupId()
 
     def icon(self):
         plugin_dir = os.path.dirname(os.path.dirname(__file__))
@@ -58,7 +58,7 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
         return QCoreApplication.translate("Processing", string)
 
     def prepareAlgorithm(self, parameter, context, feedback):
-        matplotlib.use("Agg")
+        matplotlib.use("Agg")  # Light backend renderer
         return True
 
     def advanced_param(self, parameter):
