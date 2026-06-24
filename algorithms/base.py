@@ -58,7 +58,7 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
         return QCoreApplication.translate("Processing", string)
 
     def prepareAlgorithm(self, parameter, context, feedback):
-        matplotlib.use("agg")
+        matplotlib.use("Agg")
         return True
 
     def advanced_param(self, parameter):
