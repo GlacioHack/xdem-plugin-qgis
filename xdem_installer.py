@@ -44,8 +44,8 @@ class XdemInstaller:
         self.deps_dir = os.path.join(self.plugin_dir, "xdem_dependencies")
 
         self.required_packages = [
-            "scipy==1.17 ",
-            "matplotlib==3.7",
+            "scipy==1.17",  # Force scipy version because 1.18 needs numpy 2.0 (QGIS is on numpy 1.16.4 )
+            "matplotlib",
             "pytest",
             "cerberus",
             "scikit-learn",
@@ -54,9 +54,6 @@ class XdemInstaller:
 
         self.shared_packages = [
             "rasterio",
-            "geopandas",
-            "pandas",
-            "shapely",
             "pyproj",
             "numpy",
         ]
@@ -82,8 +79,6 @@ class XdemInstaller:
                     "--target",
                     self.deps_dir,
                     package,
-                    "--trusted-host",
-                    "pypi.org",
                 ]
             )
         self.clean_shared_packages()
@@ -136,7 +131,6 @@ class XdemInstaller:
             self.set_proj_gdal_env()
 
         if not self.exist_in_qgis("xdem"):
-            shutil.rmtree(self.deps_dir)
             log("Installation failed, unable to import xdem")
             return False
 
