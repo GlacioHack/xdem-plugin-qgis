@@ -40,7 +40,7 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
     """
 
     def flags(self):
-        # Multithreading is disabled to prevent memory conflicts
+        # Algorithms are not thread safe so multithreading is disabled to prevent srash
         return super().flags() | QgsProcessingAlgorithm.FlagNoThreading
 
     def displayName(self):
@@ -58,7 +58,7 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
         return QCoreApplication.translate("Processing", string)
 
     def prepareAlgorithm(self, parameter, context, feedback):
-        matplotlib.use("Agg")  # Light backend renderer
+        matplotlib.use("Agg")  # Light backend renderer for Workflows
         return True
 
     def advanced_param(self, parameter):
