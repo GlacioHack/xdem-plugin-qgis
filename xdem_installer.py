@@ -44,7 +44,7 @@ class XdemInstaller:
         self.deps_dir = os.path.join(self.plugin_dir, "xdem_dependencies")
 
         self.required_packages = [
-            "scipy==1.17",  # Force scipy version because 1.18 needs numpy 2.0 (QGIS runs on numpy 1.16.4)*
+            "scipy==1.17",  # Force scipy version because 1.18 needs numpy 2.0 (QGIS runs on numpy 1.26.4)
             "weasyprint",
             "matplotlib",
             "pytest",
