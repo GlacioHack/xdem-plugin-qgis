@@ -28,6 +28,7 @@ from qgis.core import (
     QgsProcessingParameterRasterLayer,
 )
 from qgis.utils import iface
+from weasyprint import HTML
 from xdem.workflows import Accuracy, Topo
 from xdem.workflows.schemas import COREG_METHODS, STATS_METHODS, TERRAIN_ATTRIBUTES
 
@@ -46,9 +47,18 @@ def add_layers_to_project(output_folder):
         iface.addRasterLayer(file_path)
 
 
+def generate_pdf(output_folder):
+    """
+    Generate the pdf from the html
+    """
+    report_html = os.path.join(output_folder, "report.html")
+    report_pdf = os.path.join(output_folder, "report.pdf")
+    HTML(report_html).write_pdf(report_pdf)
+
+
 class AccuracyWorkflow(XdemProcessingAlgorithm):
     """
-    This class is designed to perform an accuracy assessment of an elevation dataset.
+    This class is designed to perform an accuracy assessment of an elevation dataset
     """
 
     def initAlgorithm(self, config=None):
@@ -178,6 +188,7 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
 
         workflow = Accuracy(config)
         workflow.run()
+        generate_pdf(output_folder)
 
         if add_layers:
             add_layers_to_project(output_folder)
@@ -207,7 +218,7 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
 
 class TopoWorkflow(XdemProcessingAlgorithm):
     """
-    This class is designed to perform a topographical summary of an elevation dataset.
+    This class is designed to perform a topographical summary of an elevation dataset
     """
 
     def initAlgorithm(self, config=None):
@@ -294,6 +305,7 @@ class TopoWorkflow(XdemProcessingAlgorithm):
 
         workflow = Topo(config)
         workflow.run()
+        generate_pdf(output_folder)
 
         if add_layers:
             add_layers_to_project(output_folder)
