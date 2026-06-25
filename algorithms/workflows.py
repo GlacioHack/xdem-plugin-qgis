@@ -28,7 +28,6 @@ from qgis.core import (
     QgsProcessingParameterRasterLayer,
 )
 from qgis.utils import iface
-from weasyprint import HTML
 from xdem.workflows import Accuracy, Topo
 from xdem.workflows.schemas import COREG_METHODS, STATS_METHODS, TERRAIN_ATTRIBUTES
 
@@ -47,13 +46,18 @@ def add_layers_to_project(output_folder):
         iface.addRasterLayer(file_path)
 
 
-def generate_pdf(output_folder):
+def generate_pdf(output_folder, feedback):
     """
     Generate the pdf from the html
     """
-    report_html = os.path.join(output_folder, "report.html")
-    report_pdf = os.path.join(output_folder, "report.pdf")
-    HTML(report_html).write_pdf(report_pdf)
+    try:
+        from weasyprint import HTML
+
+        report_html = os.path.join(output_folder, "report.html")
+        report_pdf = os.path.join(output_folder, "report.pdf")
+        HTML(report_html).write_pdf(report_pdf)
+    except Exception as e:
+        feedback.pushWarning(f"Unable to generate pdf, error:{e}")
 
 
 class AccuracyWorkflow(XdemProcessingAlgorithm):
