@@ -36,7 +36,7 @@ from .base import XdemProcessingAlgorithm
 class Coreg(XdemProcessingAlgorithm):
     def initAlgorithm(self, config=None):
         """
-        Get all the parameters of a function and displays them in the QGIS UI
+        Display parameters in the QGIS UI
         """
         self.addParameter(
             QgsProcessingParameterRasterLayer(
