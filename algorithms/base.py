@@ -79,7 +79,8 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
             # Get the type corresponding to the name
             param_type = parameter_types_dict.get(name)
 
-            if name == "method":  # Deprecated
+            # Deprecated for terrain attributes
+            if name == "method" and self.groupId() == "Terrain attributes":
                 continue
 
             elif param_type is bool:
@@ -135,10 +136,11 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
             # Get the type corresponding to the name
             param_type = parameter_types_dict.get(name, param.annotation)
 
-            if name == "method":  # Deprecated
+            # Deprecated for terrain attributes
+            if name == "method" and self.groupId() == "Terrain attributes":
                 continue
 
-            if param_type is bool:
+            elif param_type is bool:
                 kwargs[name] = self.parameterAsBoolean(parameters, name, context)
 
             elif param_type is int:
