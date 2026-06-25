@@ -31,7 +31,7 @@ from .base import XdemProcessingAlgorithm
 class Heteroscedasticity(XdemProcessingAlgorithm):
     """
     This class is designed to model Heteroscedasticity using terrain slope and maximum curvature as explanatory variables,
-    and with stable terrain as an error proxy for moving terrain.
+    and with stable terrain as an error proxy for moving terrain
     """
 
     def initAlgorithm(self, config=None):

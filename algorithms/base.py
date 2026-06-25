@@ -36,11 +36,11 @@ from qgis.PyQt.QtGui import QIcon
 
 class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
     """
-    This class represents the base class from which all xDEM algorithms inherit.
+    This class represents the base class from which all xDEM algorithms inherit
     """
 
     def flags(self):
-        # Algorithms are not thread safe so multithreading is disabled to prevent srash
+        # Algorithms are not thread safe so multithreading is disabled to prevent crash
         return super().flags() | QgsProcessingAlgorithm.FlagNoThreading
 
     def displayName(self):
@@ -72,7 +72,7 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
 
     def generate_parameters(self, func):
         """
-        Scans the specified function and generate the parameters in QGIS based on their type.
+        Scans the specified function and generate the parameters in QGIS based on their type
         """
         # Function signature
         function_signature = inspect.signature(func)
@@ -125,7 +125,7 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
 
     def get_kwargs(self, func, parameters, context):
         """
-        Scans the specified function and convert all arguments entered into QGIS.
+        Scans the specified function and convert all arguments entered into QGIS
         """
         # Function signature
         function_signature = inspect.signature(func)

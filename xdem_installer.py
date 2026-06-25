@@ -29,14 +29,14 @@ from qgis.core import Qgis, QgsMessageLog
 
 def log(message):
     """
-    Displays information in the QGIS console, in the xDEM section.
+    Displays information in the QGIS console, in the xDEM section
     """
     QgsMessageLog.logMessage(message, "xDEM", Qgis.MessageLevel.Info)
 
 
 class XdemInstaller:
     """
-    The xdem python installer.
+    The xdem python installer
     """
 
     def __init__(self):
@@ -44,7 +44,8 @@ class XdemInstaller:
         self.deps_dir = os.path.join(self.plugin_dir, "xdem_dependencies")
 
         self.required_packages = [
-            "scipy==1.17",  # Force scipy version because 1.18 needs numpy 2.0 (QGIS runs on numpy 1.16.4)
+            "scipy==1.17",  # Force scipy version because 1.18 needs numpy 2.0 (QGIS runs on numpy 1.16.4)*
+            "weasyprint",
             "matplotlib",
             "pytest",
             "cerberus",
@@ -60,7 +61,7 @@ class XdemInstaller:
 
     def exist_in_qgis(self, package):
         """
-        Check if a specified package exist in qgis.
+        Check if a specified package exist in qgis
         """
         try:
             importlib.import_module(package)
@@ -70,7 +71,7 @@ class XdemInstaller:
 
     def install_packages(self):
         """
-        Install xdem and its dependencies in the dependencies folder.
+        Install xdem and its dependencies in the dependencies folder
         """
         for package in self.required_packages:
             pip_main(
@@ -85,7 +86,7 @@ class XdemInstaller:
 
     def clean_shared_packages(self):
         """
-        Clean the libs folder by removing the packages already present in qgis.
+        Clean the libs folder by removing the packages already present in qgis
         """
         for xdem_package in os.listdir(self.deps_dir):
             for shared_package in self.shared_packages:
@@ -96,7 +97,7 @@ class XdemInstaller:
 
     def set_proj_gdal_env(self):
         """
-        Search for and set geoutils (rasterio) gdal and proj config.
+        Search for and set geoutils (rasterio) gdal and proj config
         - proj.db is the projection database containing all CRS and transforms
         - gdal_data contains drivers (GeoTIFF, JPEG2000, etc.)
         """
@@ -109,7 +110,7 @@ class XdemInstaller:
 
     def run(self):
         """
-        Check if xdem is already installed, if not it proceed with the install.
+        Check if xdem is already installed, if not it proceed with the install
         """
         # Python check, xdem works starting with version 3.10
         if sys.version_info < (3, 10):
