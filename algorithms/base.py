@@ -17,6 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import importlib
 import inspect
 import os
 from typing import Literal, get_args, get_origin, get_type_hints
@@ -65,8 +66,18 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
         )
         self.addParameter(parameter)
 
+    def cairo_available(self):
+        try:
+            importlib.import_module("cairo")
+            return True
+        except ImportError:
+            return False
+
     def prepareAlgorithm(self, parameter, context, feedback):
-        matplotlib.use("cairo")
+        if self.cairo_available():
+            matplotlib.use("cairo")
+        else:
+            matplotlib.use("agg")
         return True
 
     def generate_parameters(self, func):
