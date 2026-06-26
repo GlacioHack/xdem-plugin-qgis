@@ -20,7 +20,6 @@ import inspect
 import os
 from typing import Literal, get_args, get_origin, get_type_hints
 
-import matplotlib
 from qgis.core import (
     QgsProcessingAlgorithm,
     QgsProcessingParameterBoolean,
@@ -63,10 +62,6 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
             parameter.flags() | QgsProcessingParameterDefinition.FlagAdvanced
         )
         self.addParameter(parameter)
-
-    def prepareAlgorithm(self, parameter, context, feedback):
-        matplotlib.use("Agg")
-        return True
 
     def generate_parameters(self, func):
         """
