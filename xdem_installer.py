@@ -27,13 +27,6 @@ from pip._internal.cli.main import main as pip_main
 from qgis.core import Qgis, QgsMessageLog
 
 
-def log(message):
-    """
-    Displays information in the QGIS console, in the xDEM section
-    """
-    QgsMessageLog.logMessage(message, "xDEM", Qgis.MessageLevel.Info)
-
-
 class XdemInstaller:
     """
     The xdem python installer
@@ -58,6 +51,12 @@ class XdemInstaller:
             "pyproj",
             "numpy",
         ]
+
+    def log(self, message):
+        """
+        Displays information in the QGIS console, in the xDEM section
+        """
+        QgsMessageLog.logMessage(message, "xDEM", Qgis.MessageLevel.Info)
 
     def exist_in_qgis(self, package):
         """
@@ -115,7 +114,7 @@ class XdemInstaller:
         """
         # Python check, xdem works starting with version 3.10
         if sys.version_info < (3, 10):
-            log("Installation failed, python version lower than 3.10")
+            self.log("Installation failed, python version lower than 3.10")
             return False
 
         # Installing packages and managing conflicts
@@ -124,7 +123,7 @@ class XdemInstaller:
                 os.makedirs(self.deps_dir, exist_ok=True)
                 self.install_packages()
             except Exception as e:
-                log(f"Installation failed, error:{e}")
+                self.log(f"Installation failed, error:{e}")
                 return False
 
         # Add libs folder to the python path and initialize the proj and gdal data
@@ -133,8 +132,8 @@ class XdemInstaller:
             self.set_proj_gdal_env()
 
         if not self.exist_in_qgis("xdem"):
-            log("Installation failed, unable to import xdem")
+            self.log("Installation failed, unable to import xdem")
             return False
 
-        log("Dependencies loaded successfully")
+        self.log("Dependencies loaded successfully")
         return True
