@@ -48,6 +48,7 @@ class XdemInstaller:
             "weasyprint",
             "matplotlib",
             "pytest",
+            "cairocffi",
             "cerberus",
             "scikit-learn",
             "xdem",
