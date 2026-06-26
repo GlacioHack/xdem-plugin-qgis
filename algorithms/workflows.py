@@ -192,7 +192,7 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
 
         workflow = Accuracy(config)
         workflow.run()
-        generate_pdf(output_folder)
+        generate_pdf(output_folder, feedback)
 
         if add_layers:
             add_layers_to_project(output_folder)
@@ -309,7 +309,7 @@ class TopoWorkflow(XdemProcessingAlgorithm):
 
         workflow = Topo(config)
         workflow.run()
-        generate_pdf(output_folder)
+        generate_pdf(output_folder, feedback)
 
         if add_layers:
             add_layers_to_project(output_folder)
