@@ -37,7 +37,7 @@ class XdemInstaller:
         self.deps_dir = os.path.join(self.plugin_dir, "xdem_dependencies")
 
         self.required_packages = [
-            "scipy==1.17",  # Force scipy 1.17 because 1.18 needs numpy >= 2.0 (QGIS runs on numpy 1.26.4)
+            "scipy<=1.17",  # Force max scipy 1.17 because 1.18 needs numpy >= 2.0 (QGIS runs on numpy 1.26.4)
             "weasyprint",
             "matplotlib",
             "pytest",
@@ -72,16 +72,16 @@ class XdemInstaller:
         """
         Install xdem and its dependencies in the dependencies folder
         """
-        for package in self.required_packages:
-            pip_main(
-                [
-                    "install",
-                    "--target",
-                    self.deps_dir,
-                    package,
-                ]
-            )
-        # Clean after full install
+        pip_cmd = [
+            "install",
+            "--target",
+            self.deps_dir,
+            "--trusted-host",
+            "pypi.org",
+        ] + self.required_packages
+
+        pip_main(pip_cmd)
+
         self.clean_shared_packages()
 
     def clean_shared_packages(self):
