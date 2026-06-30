@@ -22,4 +22,4 @@ All the algorithms can be accessed through the QGIS Processing Toolbox in `xDEM`
 
 ## Documentation
 - [xDEM](https://xdem.readthedocs.io/en/stable/index.html)
-- [Developer guide](doc/dev_guide.md)
+- [Developer guide](dev_guide.md)

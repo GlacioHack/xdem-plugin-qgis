@@ -27,7 +27,16 @@ xdem-plugin-qgis/
 ```
 
 ## Developement environment
-For developers, use `git clone` for installation, here are the steps: 
+For Linux developers, it is recommended to use the stable [Flatpak](https://qgis.org/resources/installation-guide/#flatpak) version of QGIS instead of the apt version. This is a sandbox version that isolates QGIS and prevents interaction with the system's Python, avoiding version conflicts. You'll also need to make sure that pip is up to date, to do this, run this command in the QGIS Python console:
+
+```python
+import subprocess
+subprocess.run([sys.executable, "-m", "ensurepip", "--upgrade"])
+```
+
+Once these prerequisites are met, you can proceed with the installation.
+
+Use `git clone` for installation, here are the steps: 
 1. Start QGIS and locate the `plugins` directory, corresponding to your current profile.
     - Go to `Settings` > `User profiles` > `Open active profile folder` > `python` > `plugins`.
 2. Use `git clone https://github.com/GlacioHack/xdem-plugin-qgis.git` to install the xDEM plugin in this folder.
