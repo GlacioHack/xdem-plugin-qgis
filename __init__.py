@@ -37,4 +37,4 @@ def classFactory(iface):
     else:
         shutil.rmtree(installer.deps_dir)
 
-        raise Exception("Unable to load xdem, check the logs")
+        return None
