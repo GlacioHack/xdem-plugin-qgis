@@ -53,7 +53,6 @@ The tests need to be run directly from QGIS, pytest is included in the libraries
 To run the tests, go to the console, import pytest and run the following command by specifying the plugin directory.
 ```python
 import pytest
-
 pytest.main(["plugin_directory/tests", "-v"])
 ```
 The tests will run just like a standard pytest execution, with progress updates and a final summary.
