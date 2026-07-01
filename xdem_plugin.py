@@ -21,7 +21,6 @@
 import shutil
 
 from qgis.core import QgsApplication
-from qgis.utils import iface
 
 
 class XdemPlugin(object):
@@ -40,9 +39,6 @@ class XdemPlugin(object):
             QgsApplication.processingRegistry().addProvider(self.provider)
 
         else:
-            iface.messageBar().pushCritical(
-                "xDEM installation error, please check the logs section"
-            )
             shutil.rmtree(installer.deps_dir)
             self.unload()
 

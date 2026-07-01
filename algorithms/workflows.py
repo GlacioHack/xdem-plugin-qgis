@@ -57,7 +57,7 @@ def generate_pdf(output_folder, feedback):
         report_pdf = os.path.join(output_folder, "report.pdf")
         HTML(report_html).write_pdf(report_pdf)
     except Exception as e:
-        feedback.pushWarning(f"Unable to generate pdf, error:{e}")
+        feedback.pushWarning(f"Unable to generate pdf, error: {e}")
 
 
 class AccuracyWorkflow(XdemProcessingAlgorithm):
