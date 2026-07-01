@@ -18,9 +18,10 @@
 # limitations under the License.
 
 
-from qgis.core import QgsApplication
+import shutil
 
-from .xdem_provider import XdemProvider
+from qgis.core import Qgis, QgsApplication
+from qgis.utils import iface
 
 
 class XdemPlugin(object):
@@ -28,8 +29,20 @@ class XdemPlugin(object):
         self.provider = None
 
     def initProcessing(self):
-        self.provider = XdemProvider()
-        QgsApplication.processingRegistry().addProvider(self.provider)
+        from .xdem_installer import XdemInstaller
+
+        installer = XdemInstaller()
+
+        if installer.run():
+            from .xdem_provider import XdemProvider
+
+            self.provider = XdemProvider()
+            QgsApplication.processingRegistry().addProvider(self.provider)
+
+        else:
+            iface.messageBar().pushMessage("xdem install error", level=Qgis.Critical)
+            shutil.rmtree(installer.deps_dir)
+            self.unload()
 
     def initGui(self):
         self.initProcessing()
