@@ -65,6 +65,12 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
         )
         self.addParameter(parameter)
 
+    def prepareALgorithm(self, parameters, context, feedback):
+        import matplotlib
+
+        matplotlib.use("cairo")
+        return True
+
     def generate_parameters(self, func):
         """
         Scans the specified function and generate the parameters in QGIS based on their type
