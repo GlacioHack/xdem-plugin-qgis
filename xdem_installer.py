@@ -49,11 +49,11 @@ class XdemInstaller:
             "xdem",
         ]
 
-    def log(self, message):
+    def log(self, message, level=Qgis.MessageLevel.Info):
         """
         Displays information in the QGIS console, in the xDEM section
         """
-        QgsMessageLog.logMessage(message, "xDEM", Qgis.MessageLevel.Info)
+        QgsMessageLog.logMessage(message, "xDEM", level)
 
     def exist_in_qgis(self, package):
         """
@@ -100,8 +100,14 @@ class XdemInstaller:
             if installed_version in req.specifier:
                 self.log(f"Requirements: {req.name} {installed_version}, satified")
             else:
-                self.log(f"Requirements: {req.name} {installed_version}, not satisfied")
-                self.log("Installation canceled")
+                self.log(
+                    f"Requirements: {req.name} {installed_version}, not satisfied",
+                    level=Qgis.MessageLevel.Critical,
+                )
+                self.log(
+                    "Installation canceled",
+                    level=Qgis.MessageLevel.Critical,
+                )
                 return False
 
         return True
@@ -112,7 +118,10 @@ class XdemInstaller:
         """
         # Python version check
         if sys.version_info < (3, 10):
-            self.log("Installation failed, python version lower than 3.10")
+            self.log(
+                "Installation failed, python version lower than 3.10",
+                level=Qgis.MessageLevel.Critical,
+            )
             return False
 
         # Installing dependencies
@@ -132,5 +141,8 @@ class XdemInstaller:
             self.log("Dependencies loaded successfully")
             return True
         else:
-            self.log("Installation failed, unable to import xdem")
+            self.log(
+                "Installation failed, unable to import xdem",
+                level=Qgis.MessageLevel.Critical,
+            )
             return False
