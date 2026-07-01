@@ -19,6 +19,7 @@
 
 
 import importlib
+import importlib.metadata
 import os
 import sys
 
@@ -122,6 +123,7 @@ class XdemInstaller:
         if self.deps_dir not in sys.path:
             sys.path.append(self.deps_dir)
 
+        # Check requirements before import
         if not self.check_requirements():
             return False
 
