@@ -98,9 +98,13 @@ class XdemInstaller:
             installed_version = importlib.metadata.version(req.name)
 
             if installed_version in req.specifier:
-                self.log(f"Requirements satisfied, {req.name} compatible")
+                self.log(
+                    f"Requirements satisfied, {req.name} {installed_version} compatible"
+                )
             else:
-                self.log(f"Requirements not satisfied, {req.name} uncompatible")
+                self.log(
+                    f"Requirements not satisfied, {req.name} {installed_version} uncompatible \n Installation canceled"
+                )
                 return False
 
         return True
