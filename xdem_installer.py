@@ -20,9 +20,10 @@
 
 import importlib
 import os
-import shutil
 import sys
 
+import requests
+from packaging.requirements import Requirement
 from pip._internal.cli.main import main as pip_main
 from qgis.core import Qgis, QgsMessageLog
 
@@ -41,15 +42,10 @@ class XdemInstaller:
             "weasyprint",
             "matplotlib",
             "pytest",
+            "cairocffi",
             "cerberus",
             "scikit-learn",
             "xdem",
-        ]
-
-        self.shared_packages = [
-            "rasterio",
-            "pyproj",
-            "numpy",
         ]
 
     def log(self, message):
@@ -82,58 +78,56 @@ class XdemInstaller:
 
         pip_main(pip_cmd)
 
-        self.clean_shared_packages()
+    def check_requirements(self):
+        """
+        Check if the environment satisfies the requirements.
+        """
+        try:
+            url = "https://raw.githubusercontent.com/GlacioHack/xdem/main/requirements.txt"
+            requirements = requests.get(url).text
+        except Exception as e:
+            self.log("Unable to check requirements, error", e)
+            return True
 
-    def clean_shared_packages(self):
-        """
-        Clean the libs folder by removing the packages already present in qgis
-        """
-        for xdem_package in os.listdir(self.deps_dir):
-            for shared_package in self.shared_packages:
-                if self.exist_in_qgis(shared_package):
-                    if xdem_package.startswith(shared_package):
-                        target_package = os.path.join(self.deps_dir, xdem_package)
-                        shutil.rmtree(target_package)
+        for line in requirements.splitlines():
+            if not line or line.startswith("#"):
+                continue
 
-    def set_proj_gdal_env(self):
-        """
-        Search for and set geoutils (rasterio) gdal and proj config
-        - proj.db is the projection database containing all CRS and transforms
-        - gdal_data contains drivers (GeoTIFF, JPEG2000, etc.)
-        """
-        for root, dirs, files in os.walk(self.deps_dir):
-            if "rasterio" in root:
-                if "proj.db" in files:
-                    os.environ["PROJ_DATA"] = root
-                if "gdal_data" in dirs:
-                    os.environ["GDAL_DATA"] = os.path.join(root, "gdal_data")
+            req = Requirement(line)
+            installed_version = importlib.metadata.version(req.name)
+
+            if installed_version in req.specifier:
+                self.log(f"Requirements satisfied, {req.name} compatible")
+            else:
+                self.log(f"Requirements not satisfied, {req.name} uncompatible")
+                return False
+
+        return True
 
     def run(self):
         """
         Check if xdem is already installed, if not it proceed with the install
         """
-        # Python check, xdem works starting with version 3.10
+        # Python version check
         if sys.version_info < (3, 10):
             self.log("Installation failed, python version lower than 3.10")
             return False
 
-        # Installing packages and managing conflicts
+        # Installing dependencies
         if not os.path.isdir(self.deps_dir):
-            try:
-                os.makedirs(self.deps_dir, exist_ok=True)
-                self.install_packages()
-            except Exception as e:
-                self.log(f"Installation failed, error:{e}")
-                return False
+            os.makedirs(self.deps_dir, exist_ok=True)
+            self.install_packages()
 
-        # Add libs folder to the python path and initialize the proj and gdal data
+        # Add libs folder add the end of the python path and set proj and gdal environ
         if self.deps_dir not in sys.path:
-            sys.path.insert(0, self.deps_dir)
-            self.set_proj_gdal_env()
+            sys.path.append(self.deps_dir)
 
-        if not self.exist_in_qgis("xdem"):
-            self.log("Installation failed, unable to import xdem")
+        if not self.check_requirements():
             return False
 
-        self.log("Dependencies loaded successfully")
-        return True
+        if self.exist_in_qgis("xdem"):
+            self.log("Dependencies loaded successfully")
+            return True
+        else:
+            self.log("Installation failed, unable to import xdem")
+            return False
