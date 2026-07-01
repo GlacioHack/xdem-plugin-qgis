@@ -65,7 +65,7 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
         )
         self.addParameter(parameter)
 
-    def prepareALgorithm(self, parameters, context, feedback):
+    def prepareAlgorithm(self, parameters, context, feedback):
         import matplotlib
 
         matplotlib.use("cairo")
