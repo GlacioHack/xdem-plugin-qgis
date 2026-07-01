@@ -23,7 +23,7 @@ import shutil
 from qgis.core import QgsApplication
 
 
-class XdemPlugin(object):
+class XdemPlugin:
     def __init__(self):
         self.provider = None
 

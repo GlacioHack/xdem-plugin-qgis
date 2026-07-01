@@ -43,7 +43,7 @@ class XdemInstaller:
             "weasyprint",
             "matplotlib",
             "pytest",
-            "cairocffi",
+            "cairocffi",  # Matplotlib-specific backend
             "cerberus",
             "scikit-learn",
             "xdem",
@@ -87,7 +87,10 @@ class XdemInstaller:
             url = "https://raw.githubusercontent.com/GlacioHack/xdem/main/requirements.txt"
             requirements = requests.get(url).text
         except Exception as e:
-            self.log(f"Unable to check requirements, error: {e}")
+            self.log(
+                f"Unable to check requirements, error: {e}",
+                level=Qgis.MessageLevel.Warning,
+            )
             return True
 
         for line in requirements.splitlines():
