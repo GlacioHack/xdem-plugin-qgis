@@ -188,7 +188,7 @@ class DhMinimizeCoreg(Coreg):
         return xdem.coreg.DhMinimize
 
     def name(self):
-        return "Minimization of dh"
+        return "Minimization of DH"
 
     def groupId(self):
         return "Coregistration"
@@ -202,10 +202,19 @@ class NuthKaabCoreg(Coreg):
         return xdem.coreg.NuthKaab
 
     def name(self):
-        return "Nuth Kääb (2011)"
+        return "Nuth and Kääb (2011)"
 
     def groupId(self):
         return "Coregistration"
+
+    def shortHelpString(self):
+        return (
+            "The Nuth and Kääb (2011) coregistration approach estimates a horizontal translation iteratively by solving a cosine equation between the terrain slope, aspect and the elevation differences. \n"
+            "The iteration stops if it reaches the maximum number of iteration limit, or if the iterative shift amplitude falls below a specified tolerance."
+        )
+
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/coregistration.html#nuth-and-kaab-2011"
 
     def createInstance(self):
         return NuthKaabCoreg()
