@@ -10,15 +10,14 @@ xdem-plugin-qgis/
 │   ├── terrain_attributes.py
 │   ├── uncertainty.py
 │   ├── workflows.py
-├── doc/
-│   ├──dev_guide.md
 ├── img/
-│   ├──xdem_logo.svg
+│   ├── xdem_logo.svg
 ├── tests/
 │   ├── conftest.py
 │   ├── test_processing.py
-├── .gitignore
+├── LICENSE
 ├── README.md
+├── dev_guide.md
 ├── __init__.py
 ├── metadata.txt
 ├── xdem_installer.py
