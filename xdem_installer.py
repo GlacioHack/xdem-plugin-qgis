@@ -19,7 +19,6 @@
 
 
 import importlib
-import importlib.metadata
 import os
 import sys
 
