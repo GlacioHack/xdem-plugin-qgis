@@ -23,8 +23,6 @@ import importlib.metadata
 import os
 import sys
 
-import requests
-from packaging.requirements import Requirement
 from pip._internal.cli.main import main as pip_main
 from qgis.core import Qgis, QgsMessageLog
 
@@ -55,14 +53,15 @@ class XdemInstaller:
         """
         QgsMessageLog.logMessage(message, "xDEM", level)
 
-    def exist_in_qgis(self, package):
-        """
-        Check if a specified package exist in qgis
-        """
+    def xdem_installed(self):
         try:
-            importlib.import_module(package)
+            importlib.import_module("xdem")
             return True
-        except ImportError:
+        except ModuleNotFoundError as e:
+            self.log(f"xdem package not found, error: {e}")
+            return False
+        except ImportError as e:
+            self.log(f"xdem found, import error: {e}")
             return False
 
     def install_packages(self):
@@ -78,42 +77,6 @@ class XdemInstaller:
         ] + self.required_packages
 
         pip_main(pip_cmd)
-
-    def check_requirements(self):
-        """
-        Check if the environment satisfies the requirements.
-        """
-        try:
-            url = "https://raw.githubusercontent.com/GlacioHack/xdem/main/requirements.txt"
-            requirements = requests.get(url).text
-        except Exception as e:
-            self.log(
-                f"Unable to check requirements, error: {e}",
-                level=Qgis.MessageLevel.Warning,
-            )
-            return True
-
-        for line in requirements.splitlines():
-            if not line or line.startswith("#"):
-                continue
-
-            req = Requirement(line)
-            installed_version = importlib.metadata.version(req.name)
-
-            if installed_version in req.specifier:
-                self.log(f"Requirements: {req.name} {installed_version}, satified")
-            else:
-                self.log(
-                    f"Requirements: {req.name} {installed_version}, not satisfied",
-                    level=Qgis.MessageLevel.Critical,
-                )
-                self.log(
-                    "Installation canceled",
-                    level=Qgis.MessageLevel.Critical,
-                )
-                return False
-
-        return True
 
     def run(self):
         """
@@ -136,11 +99,7 @@ class XdemInstaller:
         if self.deps_dir not in sys.path:
             sys.path.append(self.deps_dir)
 
-        # Check requirements before import
-        if not self.check_requirements():
-            return False
-
-        if self.exist_in_qgis("xdem"):
+        if self.xdem_installed():
             self.log("Dependencies loaded successfully")
             return True
         else:
