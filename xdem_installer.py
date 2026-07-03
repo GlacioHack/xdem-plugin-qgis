@@ -95,7 +95,7 @@ class XdemInstaller:
             os.makedirs(self.deps_dir, exist_ok=True)
             self.install_packages()
 
-        # Add libs folder add the end of the python path and set proj and gdal environ
+        # Add libs folder add the end of the python path
         if self.deps_dir not in sys.path:
             sys.path.append(self.deps_dir)
 
