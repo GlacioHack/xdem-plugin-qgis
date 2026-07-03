@@ -64,7 +64,7 @@ Currently, there are 3 tests:
 These tests verify that the algorithms execute correctly and that their outputs are valid.
 
 ## Process algorithms
-Processing methods are divided into four categories, it's all in the `algorithms` folder.
+Processing methods are divided into five categories, it's all in the `algorithms` folder.
 - **Bias corrections**: For correction methods designed to correct both systematic elevation errors and spatially structured random errors.
 - **Coregistration**: For affine transformations, these can include vertical and horizontal translations, rotations and scalings.
 - **Terrain attributes**: To calculate derivatives of DEMs, such as curvatures.

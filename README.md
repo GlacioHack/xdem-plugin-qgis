@@ -13,7 +13,7 @@ It will take a few minutes for the dependencies to install properly, do not forc
 Once installation is complete, xDEM will appear in the processing toolbox.
 
 ## Available processing
-All the algorithms can be accessed through the QGIS Processing Toolbox in `xDEM`, they are organized into four sections.
+All the algorithms can be accessed through the QGIS Processing Toolbox in `xDEM`, they are organized into five sections.
 - **Bias corrections**: For correction methods designed to correct both systematic elevation errors and spatially structured random errors.
 - **Coregistration**: For affine transformations, these can include vertical and horizontal translations, rotations and scalings.
 - **Terrain attributes**: To calculate derivatives of DEMs, such as curvatures.
