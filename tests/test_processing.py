@@ -55,7 +55,7 @@ def test_coreg(tba_dem_layer, ref_dem_layer, tmp_path):
     output_path = os.path.join(tmp_path, "test_coreg.tif")
 
     result = processing.run(
-        "XDEM:Nuth Kääb (2011)",
+        "XDEM:Nuth and Kääb (2011)",
         {
             "tba_dem": tba_dem_layer,
             "ref_dem": ref_dem_layer,
