@@ -78,6 +78,9 @@ class Slope(TerrainAttributes):
     def name(self):
         return "Slope"
 
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/terrain.html#slope"
+
     def createInstance(self):
         return Slope()
 

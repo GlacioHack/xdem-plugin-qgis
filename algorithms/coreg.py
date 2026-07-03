@@ -165,6 +165,12 @@ class ICPCoreg(Coreg):
     def groupId(self):
         return "Coregistration"
 
+    def shortHelpString(self):
+        return "Iterative closest point (ICP) coregistration is an iterative point cloud registration method, it aims at iteratively minimizing the distance between closest neighbours by applying sequential rigid transformations."
+
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/coregistration.html#iterative-closest-point"
+
     def createInstance(self):
         return ICPCoreg()
 
@@ -178,6 +184,12 @@ class LZDCoreg(Coreg):
 
     def groupId(self):
         return "Coregistration"
+
+    def shortHelpString(self):
+        return "Least Z-difference (LZD) coregistration is an iterative point-grid registration method from Rosenholm and Torlegård (1988)."
+
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/coregistration.html#least-z-difference"
 
     def createInstance(self):
         return LZDCoreg()
