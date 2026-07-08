@@ -53,6 +53,7 @@ class Heteroscedasticity(XdemProcessingAlgorithm):
             QgsProcessingParameterRasterLayer(
                 name="mask",
                 description="Stable terrain mask",
+                optional=True,
             )
         )
 
@@ -92,6 +93,14 @@ class Heteroscedasticity(XdemProcessingAlgorithm):
 
         error_map.to_file(output_path)
 
+        for slope, maxc in [(0, 0), (40, 0), (0, 5), (40, 5)]:
+            feedback.pushInfo(
+                "Error for a slope of {:.0f} degrees and"
+                " {:.2f} m-1 max. curvature: {:.1f} m".format(
+                    slope, maxc / 100, error_function((slope, maxc))
+                )
+            )
+
         return {"output": output_path}
 
     def name(self):
@@ -99,6 +108,11 @@ class Heteroscedasticity(XdemProcessingAlgorithm):
 
     def groupId(self):
         return "Uncertainty"
+
+    def helpUrl(self):
+        return (
+            "https://xdem.readthedocs.io/en/stable/uncertainty.html#heteroscedasticity"
+        )
 
     def shortHelpString(self):
         return (

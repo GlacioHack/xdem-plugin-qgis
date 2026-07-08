@@ -139,6 +139,12 @@ class Coreg(XdemProcessingAlgorithm):
 
         return {"output": output_path}
 
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/coregistration.html"
+
+    def shortHelpString(self):
+        return self.coreg_class().__doc__
+
 
 # Coregistration
 class CPDCoreg(Coreg):
@@ -165,12 +171,6 @@ class ICPCoreg(Coreg):
     def groupId(self):
         return "Coregistration"
 
-    def shortHelpString(self):
-        return "Iterative closest point (ICP) coregistration is an iterative point cloud registration method, it aims at iteratively minimizing the distance between closest neighbours by applying sequential rigid transformations."
-
-    def helpUrl(self):
-        return "https://xdem.readthedocs.io/en/stable/coregistration.html#iterative-closest-point"
-
     def createInstance(self):
         return ICPCoreg()
 
@@ -184,12 +184,6 @@ class LZDCoreg(Coreg):
 
     def groupId(self):
         return "Coregistration"
-
-    def shortHelpString(self):
-        return "Least Z-difference (LZD) coregistration is an iterative point-grid registration method from Rosenholm and Torlegård (1988)."
-
-    def helpUrl(self):
-        return "https://xdem.readthedocs.io/en/stable/coregistration.html#least-z-difference"
 
     def createInstance(self):
         return LZDCoreg()
@@ -218,15 +212,6 @@ class NuthKaabCoreg(Coreg):
 
     def groupId(self):
         return "Coregistration"
-
-    def shortHelpString(self):
-        return (
-            "The Nuth and Kääb (2011) coregistration approach estimates a horizontal translation iteratively by solving a cosine equation between the terrain slope, aspect and the elevation differences. \n"
-            "The iteration stops if it reaches the maximum number of iteration limit, or if the iterative shift amplitude falls below a specified tolerance."
-        )
-
-    def helpUrl(self):
-        return "https://xdem.readthedocs.io/en/stable/coregistration.html#nuth-and-kaab-2011"
 
     def createInstance(self):
         return NuthKaabCoreg()
