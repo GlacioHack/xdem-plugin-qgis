@@ -208,6 +208,9 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
     def tags(self):
         return COREG_METHODS
 
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/cli_accuracy.html"
+
     def shortHelpString(self):
         return (
             "The accuracy workflow performs an accuracy assessment of an elevation dataset.\n"
@@ -324,6 +327,9 @@ class TopoWorkflow(XdemProcessingAlgorithm):
 
     def tags(self):
         return TERRAIN_ATTRIBUTES
+
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/cli_topo.html"
 
     def shortHelpString(self):
         return (
