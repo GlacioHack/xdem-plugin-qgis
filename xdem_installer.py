@@ -22,6 +22,7 @@ import importlib
 import os
 import shutil
 import sys
+from importlib.metadata import version
 
 from pip._internal.cli.main import main as pip_main
 from qgis.core import Qgis, QgsMessageLog
@@ -87,11 +88,9 @@ class XdemInstaller:
         pip_main(pip_cmd)
 
     def check_version(self):
-        import xdem
-
-        if not xdem.__version__ == self.plugin_version:
+        if not version("xdem") == self.plugin_version:
+            self.log(f"Update to xdem version {self.plugin_version}")
             shutil.rmtree(self.deps_dir)
-            self.log(f"Update to xdem version{self.plugin_version}")
             self.run()
 
     def run(self):
@@ -116,8 +115,8 @@ class XdemInstaller:
             sys.path.append(self.deps_dir)
 
         if self.xdem_installed():
-            self.check_version()
             self.log("Dependencies loaded successfully")
+            self.check_version()
             return True
         else:
             self.log(
