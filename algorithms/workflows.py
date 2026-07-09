@@ -96,7 +96,7 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
                 name="level",
                 description="Level for detailed outputs",
                 options=["1", "2"],
-                defaultValue="2",
+                defaultValue="1",
                 usesStaticStrings=True,
             )
         )
@@ -145,7 +145,7 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
 
         self.addParameter(
             QgsProcessingParameterFolderDestination(
-                name="output", description="Accuracy folder"
+                name="output", description="Output folder"
             )
         )
 
@@ -278,7 +278,7 @@ class TopoWorkflow(XdemProcessingAlgorithm):
 
         self.addParameter(
             QgsProcessingParameterFolderDestination(
-                name="output", description="Topography folder"
+                name="output", description="Output folder"
             )
         )
 
