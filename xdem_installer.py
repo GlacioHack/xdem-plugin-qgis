@@ -20,6 +20,7 @@
 
 import importlib
 import os
+import shutil
 import sys
 
 from pip._internal.cli.main import main as pip_main
@@ -35,6 +36,14 @@ class XdemInstaller:
         self.plugin_dir = os.path.dirname(__file__)
         self.deps_dir = os.path.join(self.plugin_dir, "xdem_dependencies")
 
+        metadata_file = os.path.join(self.plugin_dir, "metadata.txt")
+        with open(metadata_file, "r") as f:
+            for line in f:
+                if line.startswith("version="):
+                    line_splited = line.split("=")
+                    self.plugin_version = line_splited[1].strip()
+                    break
+
         self.required_packages = [
             "scipy<=1.17",  # Force max scipy 1.17 because 1.18 needs numpy >= 2.0 (QGIS runs on numpy 1.26.4)
             "weasyprint",
@@ -43,7 +52,7 @@ class XdemInstaller:
             "cairocffi",  # Matplotlib-specific backend
             "cerberus",
             "scikit-learn",
-            "xdem",
+            f"xdem=={self.plugin_version}",
         ]
 
     def log(self, message, level=Qgis.MessageLevel.Info):
@@ -77,6 +86,14 @@ class XdemInstaller:
 
         pip_main(pip_cmd)
 
+    def check_version(self):
+        import xdem
+
+        if not xdem.__version__ == self.plugin_version:
+            shutil.rmtree(self.deps_dir)
+            self.log(f"Update to xdem version{self.plugin_version}")
+            self.run()
+
     def run(self):
         """
         Check if xdem is already installed, if not it proceed with the install
@@ -99,6 +116,7 @@ class XdemInstaller:
             sys.path.append(self.deps_dir)
 
         if self.xdem_installed():
+            self.check_version()
             self.log("Dependencies loaded successfully")
             return True
         else:
