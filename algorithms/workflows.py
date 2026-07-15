@@ -20,6 +20,7 @@
 
 import os
 
+import plutoprint
 from qgis.core import (
     QgsProcessingParameterBoolean,
     QgsProcessingParameterDefinition,
@@ -50,14 +51,9 @@ def generate_pdf(output_folder, feedback):
     """
     Generate the pdf from the html
     """
-    try:
-        from weasyprint import HTML
-
-        report_html = os.path.join(output_folder, "report.html")
-        report_pdf = os.path.join(output_folder, "report.pdf")
-        HTML(report_html).write_pdf(report_pdf)
-    except Exception as e:
-        feedback.pushWarning(f"Unable to generate pdf, error: {e}")
+    book = plutoprint.Book(plutoprint.PAGE_SIZE_A4)
+    book.load_url(os.path.join(output_folder, "report.html"))
+    book.write_to_pdf(os.path.join(output_folder, "report.pdf"))
 
 
 class AccuracyWorkflow(XdemProcessingAlgorithm):

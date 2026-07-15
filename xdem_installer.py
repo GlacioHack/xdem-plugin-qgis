@@ -47,7 +47,7 @@ class XdemInstaller:
 
         self.required_packages = [
             "scipy<=1.17",  # Force max scipy 1.17 because 1.18 needs numpy >= 2.0 (QGIS runs on numpy 1.26.4)
-            "weasyprint",
+            "plutoprint",
             "matplotlib",
             "pytest",
             "cairocffi",  # Matplotlib-specific backend
