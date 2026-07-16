@@ -19,6 +19,7 @@
 
 
 import os
+import webbrowser
 
 import plutoprint
 from qgis.core import (
@@ -47,13 +48,21 @@ def add_layers_to_project(output_folder):
         iface.addRasterLayer(file_path)
 
 
-def generate_pdf(output_folder, feedback):
+def generate_pdf(output_folder):
     """
     Generate the pdf from the html
     """
     book = plutoprint.Book(plutoprint.PAGE_SIZE_A4)
     book.load_url(os.path.join(output_folder, "report.html"))
     book.write_to_pdf(os.path.join(output_folder, "report.pdf"))
+
+
+def open_pdf(output_folder):
+    """
+    Open the pdf in the browser
+    """
+    path = os.path.join(output_folder, "report.pdf")
+    webbrowser.open(f"file://{path}")
 
 
 class AccuracyWorkflow(XdemProcessingAlgorithm):
@@ -188,10 +197,11 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
 
         workflow = Accuracy(config)
         workflow.run()
-        generate_pdf(output_folder, feedback)
+        generate_pdf(output_folder)
 
         if add_layers:
             add_layers_to_project(output_folder)
+            open_pdf(output_folder)
 
         return {}
 
@@ -308,10 +318,11 @@ class TopoWorkflow(XdemProcessingAlgorithm):
 
         workflow = Topo(config)
         workflow.run()
-        generate_pdf(output_folder, feedback)
+        generate_pdf(output_folder)
 
         if add_layers:
             add_layers_to_project(output_folder)
+            open_pdf(output_folder)
 
         return {}
 
