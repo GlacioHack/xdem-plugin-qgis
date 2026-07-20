@@ -43,9 +43,9 @@ def tba_dem_layer(ref_dem_path, tmp_path):
     ref_dem = xdem.DEM(ref_dem_path)
 
     # Create a shift matrix
-    x_shift = 30
-    y_shift = 30
-    z_shift = 10
+    x_shift = 10
+    y_shift = 10
+    z_shift = 5
     matrix = np.array(
         [
             [1, 0, 0, x_shift],
