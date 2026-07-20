@@ -118,7 +118,7 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
             QgsProcessingParameterBoolean(
                 name="open_pdf",
                 description="Open PDF report",
-                defaultValue=True,
+                defaultValue=False,
             )
         )
 
@@ -234,7 +234,8 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
             "The accuracy workflow performs an accuracy assessment of an elevation dataset.\n"
             "This assessment relies on analyzing the elevation differences to a secondary elevation dataset on static surfaces, "
             "as an error proxy to perform coregistration and bias-correction (systematic errors) and to perform uncertainty quantification (structured random errors).\n"
-            "Two output levels are available, Level 1 corresponds to the basic version, while Level 2 allows you to save rasters and statistics."
+            "Two output levels are available, Level 1 corresponds to the basic version, while Level 2 allows you to save rasters and statistics.\n"
+            "Note: The PDF may fail to open if the folder is not saved."
         )
 
     def createInstance(self):
@@ -298,7 +299,7 @@ class TopoWorkflow(XdemProcessingAlgorithm):
             QgsProcessingParameterBoolean(
                 name="open_pdf",
                 description="Open PDF report",
-                defaultValue=True,
+                defaultValue=False,
             )
         )
 
@@ -367,7 +368,8 @@ class TopoWorkflow(XdemProcessingAlgorithm):
             "The topo workflow performs a topographical summary of an elevation dataset.\n"
             "This summary derives a series of terrain attributes (e.g. slope, hillshade, aspect, etc.) "
             "with statistics (e.g. mean, max, min, etc.).\n"
-            "Two output levels are available, Level 1 corresponds to the basic version, while Level 2 allows you to save rasters and statistics."
+            "Two output levels are available, Level 1 corresponds to the basic version, while Level 2 allows you to save rasters and statistics.\n"
+            "Note: The PDF may fail to open if the folder is not saved."
         )
 
     def createInstance(self):
