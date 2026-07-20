@@ -57,7 +57,7 @@ def generate_pdf(output_folder):
     book.write_to_pdf(os.path.join(output_folder, "report.pdf"))
 
 
-def open_pdf(output_folder):
+def open_pdf_in_browser(output_folder):
     """
     Open the pdf in the browser
     """
@@ -115,6 +115,14 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
         )
 
         self.addParameter(
+            QgsProcessingParameterBoolean(
+                name="open_pdf",
+                description="Open PDF report",
+                defaultValue=True,
+            )
+        )
+
+        self.addParameter(
             QgsProcessingParameterEnum(
                 name="method1",
                 description="Method - 1",
@@ -166,6 +174,7 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
         stats = self.parameterAsEnumStrings(parameters, "stats", context)
         level = self.parameterAsInt(parameters, "level", context)
         add_layers = self.parameterAsBoolean(parameters, "add_layers", context)
+        open_pdf = self.parameterAsBoolean(parameters, "open_pdf", context)
         method1 = self.parameterAsString(parameters, "method1", context)
         method2 = self.parameterAsString(parameters, "method2", context)
         method3 = self.parameterAsString(parameters, "method3", context)
@@ -197,11 +206,14 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
 
         workflow = Accuracy(config)
         workflow.run()
+
         generate_pdf(output_folder)
 
         if add_layers:
             add_layers_to_project(output_folder)
-            open_pdf(output_folder)
+
+        if open_pdf:
+            open_pdf_in_browser(output_folder)
 
         return {}
 
@@ -283,6 +295,14 @@ class TopoWorkflow(XdemProcessingAlgorithm):
         )
 
         self.addParameter(
+            QgsProcessingParameterBoolean(
+                name="open_pdf",
+                description="Open PDF report",
+                defaultValue=True,
+            )
+        )
+
+        self.addParameter(
             QgsProcessingParameterFolderDestination(
                 name="output", description="Output folder"
             )
@@ -299,6 +319,7 @@ class TopoWorkflow(XdemProcessingAlgorithm):
         stats = self.parameterAsEnumStrings(parameters, "stats", context)
         level = self.parameterAsInt(parameters, "level", context)
         add_layers = self.parameterAsBoolean(parameters, "add_layers", context)
+        open_pdf = self.parameterAsBoolean(parameters, "open_pdf", context)
 
         output_folder = self.parameterAsString(parameters, "output", context)
         os.makedirs(output_folder, exist_ok=True)
@@ -318,11 +339,14 @@ class TopoWorkflow(XdemProcessingAlgorithm):
 
         workflow = Topo(config)
         workflow.run()
+
         generate_pdf(output_folder)
 
         if add_layers:
             add_layers_to_project(output_folder)
-            open_pdf(output_folder)
+
+        if open_pdf:
+            open_pdf_in_browser(output_folder)
 
         return {}
 

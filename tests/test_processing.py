@@ -100,6 +100,7 @@ def test_workflow(ref_dem_layer, tmp_path):
             "stats": ["min", "max", "mean", "median", "nmad"],
             "level": "2",
             "add_layers": False,
+            "open_pdf": False,
             "output": output_folder,
         },
     )
