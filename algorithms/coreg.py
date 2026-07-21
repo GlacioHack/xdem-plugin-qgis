@@ -139,9 +139,6 @@ class Coreg(XdemProcessingAlgorithm):
 
         return {"output": output_path}
 
-    def helpUrl(self):
-        return "https://xdem.readthedocs.io/en/stable/coregistration.html"
-
     def shortHelpString(self):
         return self.coreg_class().__doc__
 
@@ -160,6 +157,9 @@ class CPDCoreg(Coreg):
     def createInstance(self):
         return CPDCoreg()
 
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/coregistration.html#coherent-point-drift"
+
 
 class ICPCoreg(Coreg):
     def coreg_class(self):
@@ -173,6 +173,9 @@ class ICPCoreg(Coreg):
 
     def createInstance(self):
         return ICPCoreg()
+
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/coregistration.html#iterative-closest-point"
 
 
 class LZDCoreg(Coreg):
@@ -188,6 +191,9 @@ class LZDCoreg(Coreg):
     def createInstance(self):
         return LZDCoreg()
 
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/coregistration.html#least-z-difference"
+
 
 class DhMinimizeCoreg(Coreg):
     def coreg_class(self):
@@ -201,6 +207,9 @@ class DhMinimizeCoreg(Coreg):
 
     def createInstance(self):
         return DhMinimizeCoreg()
+
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/coregistration.html#minimization-of-dh"
 
 
 class NuthKaabCoreg(Coreg):
@@ -216,6 +225,9 @@ class NuthKaabCoreg(Coreg):
     def createInstance(self):
         return NuthKaabCoreg()
 
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/coregistration.html#nuth-and-kaab-2011"
+
 
 class VerticalShiftCoreg(Coreg):
     def coreg_class(self):
@@ -229,6 +241,11 @@ class VerticalShiftCoreg(Coreg):
 
     def createInstance(self):
         return VerticalShiftCoreg()
+
+    def helpUrl(self):
+        return (
+            "https://xdem.readthedocs.io/en/stable/coregistration.html#vertical-shift"
+        )
 
 
 # Bias correction
@@ -245,6 +262,9 @@ class DerampCoreg(Coreg):
     def createInstance(self):
         return DerampCoreg()
 
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/biascorr.html#deramping"
+
 
 class DirectionalBiasCoreg(Coreg):
     def coreg_class(self):
@@ -259,6 +279,9 @@ class DirectionalBiasCoreg(Coreg):
     def createInstance(self):
         return DirectionalBiasCoreg()
 
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/biascorr.html#directional-biases"
+
 
 class TerrainBiasCoreg(Coreg):
     def coreg_class(self):
@@ -272,3 +295,6 @@ class TerrainBiasCoreg(Coreg):
 
     def createInstance(self):
         return TerrainBiasCoreg()
+
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/biascorr.html#terrain-biases"

@@ -70,9 +70,6 @@ class TerrainAttributes(XdemProcessingAlgorithm):
     def groupId(self):
         return "Terrain attributes"
 
-    def helpUrl(self):
-        return "https://xdem.readthedocs.io/en/stable/terrain.html"
-
     def shortHelpString(self):
         return self.func().__doc__
 
@@ -87,6 +84,9 @@ class Slope(TerrainAttributes):
     def createInstance(self):
         return Slope()
 
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/terrain.html#slope"
+
 
 class Hillshade(TerrainAttributes):
     def func(self):
@@ -97,6 +97,9 @@ class Hillshade(TerrainAttributes):
 
     def createInstance(self):
         return Hillshade()
+
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/terrain.html#hillshade"
 
 
 class Aspect(TerrainAttributes):
@@ -109,6 +112,9 @@ class Aspect(TerrainAttributes):
     def createInstance(self):
         return Aspect()
 
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/terrain.html#aspect"
+
 
 class TopographicPositionIndex(TerrainAttributes):
     def func(self):
@@ -119,6 +125,9 @@ class TopographicPositionIndex(TerrainAttributes):
 
     def createInstance(self):
         return TopographicPositionIndex()
+
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/terrain.html#topographic-position-index"
 
 
 class TerrainRuggednessIndex(TerrainAttributes):
@@ -131,6 +140,9 @@ class TerrainRuggednessIndex(TerrainAttributes):
     def createInstance(self):
         return TerrainRuggednessIndex()
 
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/terrain.html#terrain-ruggedness-index"
+
 
 class Roughness(TerrainAttributes):
     def func(self):
@@ -141,6 +153,9 @@ class Roughness(TerrainAttributes):
 
     def createInstance(self):
         return Roughness()
+
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/terrain.html#roughness"
 
 
 class Rugosity(TerrainAttributes):
@@ -153,6 +168,9 @@ class Rugosity(TerrainAttributes):
     def createInstance(self):
         return Rugosity()
 
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/terrain.html#rugosity"
+
 
 class FractalRoughness(TerrainAttributes):
     def func(self):
@@ -163,6 +181,9 @@ class FractalRoughness(TerrainAttributes):
 
     def createInstance(self):
         return FractalRoughness()
+
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/terrain.html#fractal-roughness"
 
 
 class TextureShading(TerrainAttributes):
@@ -175,6 +196,9 @@ class TextureShading(TerrainAttributes):
     def createInstance(self):
         return TextureShading()
 
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/terrain.html#texture-shading"
+
 
 class TangentialCurvature(TerrainAttributes):
     def func(self):
@@ -185,6 +209,9 @@ class TangentialCurvature(TerrainAttributes):
 
     def createInstance(self):
         return TangentialCurvature()
+
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/terrain.html#tangential-curvature"
 
 
 class PlanformCurvature(TerrainAttributes):
@@ -197,6 +224,9 @@ class PlanformCurvature(TerrainAttributes):
     def createInstance(self):
         return PlanformCurvature()
 
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/terrain.html#planform-curvature"
+
 
 class ProfileCurvature(TerrainAttributes):
     def func(self):
@@ -207,6 +237,9 @@ class ProfileCurvature(TerrainAttributes):
 
     def createInstance(self):
         return ProfileCurvature()
+
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/terrain.html#profile-curvature"
 
 
 class FlowlineCurvature(TerrainAttributes):
@@ -219,6 +252,9 @@ class FlowlineCurvature(TerrainAttributes):
     def createInstance(self):
         return FlowlineCurvature()
 
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/terrain.html#flowline-curvature"
+
 
 class MaxCurvature(TerrainAttributes):
     def func(self):
@@ -230,6 +266,9 @@ class MaxCurvature(TerrainAttributes):
     def createInstance(self):
         return MaxCurvature()
 
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/terrain.html#maximal-maximum-curvature"
+
 
 class MinCurvature(TerrainAttributes):
     def func(self):
@@ -240,3 +279,6 @@ class MinCurvature(TerrainAttributes):
 
     def createInstance(self):
         return MinCurvature()
+
+    def helpUrl(self):
+        return "https://xdem.readthedocs.io/en/stable/terrain.html#minimal-minimum-curvature"
