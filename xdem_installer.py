@@ -67,10 +67,10 @@ class XdemInstaller:
             importlib.import_module("xdem")
             return True
         except ModuleNotFoundError as e:
-            self.log(f"xdem package not found, error: {e}")
+            self.log(f"xDEM package not found, error: {e}")
             return False
         except ImportError as e:
-            self.log(f"xdem found, import error: {e}")
+            self.log(f"xDEM found, import error: {e}")
             return False
 
     def install_packages(self):
@@ -89,7 +89,7 @@ class XdemInstaller:
 
     def check_version(self):
         if not version("xdem") == self.plugin_version:
-            self.log(f"Update to xdem version {self.plugin_version}")
+            self.log(f"Update to xDEM {self.plugin_version}")
             shutil.rmtree(self.deps_dir)
             self.run()
 
@@ -115,12 +115,12 @@ class XdemInstaller:
             sys.path.append(self.deps_dir)
 
         if self.xdem_installed():
-            self.log("Dependencies loaded successfully")
+            self.log(f"xDEM {self.plugin_version} loaded successfully")
             self.check_version()
             return True
         else:
             self.log(
-                "Installation failed, unable to import xdem",
+                "Installation failed, unable to import xDEM",
                 level=Qgis.MessageLevel.Critical,
             )
             return False
