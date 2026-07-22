@@ -42,7 +42,7 @@ class XdemInstaller:
             for line in f:
                 if line.startswith("version="):
                     line_splited = line.split("=")
-                    self.plugin_version = line_splited[1].strip()
+                    self.required_xdem_version = (line_splited[1])[0:5]
                     break
 
         self.required_packages = [
@@ -53,7 +53,7 @@ class XdemInstaller:
             "cairocffi",  # Matplotlib-specific backend
             "cerberus",
             "scikit-learn",
-            f"xdem=={self.plugin_version}",
+            f"xdem=={self.required_xdem_version}",
         ]
 
     def log(self, message, level=Qgis.MessageLevel.Info):
@@ -88,8 +88,8 @@ class XdemInstaller:
         pip_main(pip_cmd)
 
     def check_version(self):
-        if not version("xdem") == self.plugin_version:
-            self.log(f"Update to xDEM {self.plugin_version}")
+        if not version("xdem") == self.required_xdem_version:
+            self.log(f"Update to xDEM {self.required_xdem_version}")
             shutil.rmtree(self.deps_dir)
             self.run()
 
@@ -115,7 +115,7 @@ class XdemInstaller:
             sys.path.append(self.deps_dir)
 
         if self.xdem_installed():
-            self.log(f"xDEM {self.plugin_version} loaded successfully")
+            self.log(f"xDEM {self.required_xdem_version} loaded successfully")
             self.check_version()
             return True
         else:
