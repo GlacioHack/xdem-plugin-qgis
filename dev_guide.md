@@ -42,9 +42,13 @@ Use `git clone` for installation, here are the steps:
 3. Restart QGIS.
 4. Open the plugins menu and check the box to enable xDEM.
 
-It will take a few minutes for the dependencies to install properly, do not force QGIS to close.
+It will take a few minutes for the dependencies to install properly, do not force QGIS to close. The installation logs can be accessed via the menu bar in the `Log Message Panel`. There is a dedicated `xDEM` section, which displays the version loaded at startup and any potential installation errors.
 
 A plugin that will be very helpful during development is [Plugin Reloader](https://plugins.qgis.org/plugins/plugin_reloader/). By default, when changes are made to the plugin code, QGIS must be restarted. This extension allows plugins to be refreshed without closing the software.
+
+## Version
+The plugin version consists of four digits, the first three represent the compatible xDEM version, and the last digit represents the plugin version.
+For example, if the plugin is version `0.2.3.1`, it works with xDEM `0.2.3`. To ensure compatibility, a version check is performed at each QGIS startup.
 
 ## Tests
 The tests need to be run directly from QGIS, pytest is included in the libraries installed with the plugin.
@@ -61,7 +65,7 @@ Currently, there are 3 tests:
 - Coregistration
 - Workflows
 
-These tests verify that the algorithms execute correctly and that their outputs are valid.
+These tests verify that the algorithms execute correctly and that their outputs are valid for QGIS.
 
 ## Process algorithms
 Processing methods are divided into five categories, it's all in the `algorithms` folder.
