@@ -6,7 +6,7 @@ about=
 
     Python dependencies are installed automatically the first time the plugin runs. The installation may take a few minutes, please do not close QGIS during this process.
 
-version=0.2.3
+version=0.2.3.1
 qgisMinimumVersion=3.28
 qgisMaximumVersion=4.9
 
