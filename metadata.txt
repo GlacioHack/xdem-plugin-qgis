@@ -2,9 +2,9 @@
 name=xDEM
 description=A wide range of high-level operations required for analyzing elevation data.
 about=
-    This plugin is part of the xDEM Python package. A package developed in collaboration between CNES (the French space agency) and Glacio Hack (a group of glaciology researchers).
+    This plugin is part of the xDEM Python package, a collaboration between CNES (the French space agency) and GlacioHack (a group of glaciology researchers).
 
-    Python dependencies get installed automatically during the first start, it will take a few minutes, do not force QGIS to close.
+    Python dependencies are installed automatically the first time the plugin runs. The installation may take a few minutes, please do not close QGIS during this process.
 
 version=0.2.3
 qgisMinimumVersion=3.28
