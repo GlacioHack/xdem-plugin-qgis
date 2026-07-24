@@ -83,15 +83,26 @@ class XdemInstaller:
             self.deps_dir,
             "--trusted-host",
             "pypi.org",
+            "--trusted-host",
+            "files.pythonhosted.org",
         ] + self.required_packages
 
         pip_main(pip_cmd)
 
     def check_version(self):
-        if not version("xdem") == self.required_xdem_version:
+        if version("xdem") != self.required_xdem_version:
             self.log(f"Update to xDEM {self.required_xdem_version}")
             shutil.rmtree(self.deps_dir)
             self.run()
+
+    def set_proj_db(self):
+        """
+        Search for and set proj database
+        """
+        for root, dirs, files in os.walk(self.deps_dir):
+            if "rasterio" in root and "proj.db" in files:
+                os.environ["PROJ_DATA"] = root
+                break
 
     def run(self):
         """
@@ -113,6 +124,7 @@ class XdemInstaller:
         # Add libs folder add the end of the python path
         if self.deps_dir not in sys.path:
             sys.path.append(self.deps_dir)
+            self.set_proj_db()
 
         if self.xdem_installed():
             self.log(f"xDEM {self.required_xdem_version} loaded successfully")
