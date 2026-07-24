@@ -38,6 +38,8 @@ class XdemInstaller:
         self.deps_dir = os.path.join(self.plugin_dir, "xdem_dependencies")
 
         metadata_file = os.path.join(self.plugin_dir, "metadata.txt")
+
+        # Cut the plugin version in metadata.txt to get the xDEM version
         with open(metadata_file, "r") as f:
             for line in f:
                 if line.startswith("version="):
@@ -102,6 +104,7 @@ class XdemInstaller:
         for root, dirs, files in os.walk(self.deps_dir):
             if "rasterio" in root and "proj.db" in files:
                 os.environ["PROJ_DATA"] = root
+                self.log("Geoutils PROJ_DATA environment variable initialized")
                 break
 
     def run(self):
