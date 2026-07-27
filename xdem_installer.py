@@ -104,7 +104,7 @@ class XdemInstaller:
         for root, dirs, files in os.walk(self.deps_dir):
             if "rasterio" in root and "proj.db" in files:
                 os.environ["PROJ_DATA"] = root
-                self.log("Geoutils PROJ_DATA environment variable initialized")
+                self.log("Geoutils PROJ_DATA initialized")
                 break
 
     def run(self):
