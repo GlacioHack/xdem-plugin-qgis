@@ -19,6 +19,7 @@
 
 
 import os
+import sys
 
 import numpy as np
 import processing
@@ -29,9 +30,14 @@ def check_layer(ref_layer, output_layer):
     """
     Check if the output layer can be open in qgis and if projecttion is valid
     """
-    assert output_layer.isValid()
-    assert ref_layer.crs() == output_layer.crs()
-    assert ref_layer.extent() == output_layer.extent()
+    if not output_layer.isValid():
+        sys.exit("Layer not valid")
+
+    if ref_layer.crs() != output_layer.crs():
+        sys.exit("CRS not valid")
+
+    if ref_layer.extent() != output_layer.extent():
+        sys.exit("Extend not valid")
 
 
 def test_terrain_attribute(ref_dem_layer, tmp_path):
@@ -81,10 +87,12 @@ def test_coreg(tba_dem_layer, ref_dem_layer, tmp_path):
     tol = ref_dem_layer.rasterUnitsPerPixelX()
 
     # First, check if the tba dem does not pass the conditions
-    assert not np.allclose(ref_dem_array, tba_dem_array, atol=tol)
+    if np.allclose(ref_dem_array, tba_dem_array, atol=tol):
+        sys.exit("Coregistration already performed")
 
     # Next, check if there has been an improvement
-    assert np.allclose(ref_dem_array, output_array, atol=tol)
+    if not np.allclose(ref_dem_array, output_array, atol=tol):
+        sys.exit("Coregistration performed successfuly")
 
 
 def test_workflow(ref_dem_layer, tmp_path):
@@ -106,12 +114,14 @@ def test_workflow(ref_dem_layer, tmp_path):
     )
     # Check if html was generated
     output_files = os.listdir(output_folder)
-    assert "report.html" in output_files
+    if "report.html" not in output_files:
+        sys.exit("Report not generated")
 
     # Check if all raster where generated
     raster_folder = os.path.join(output_folder, "rasters")
 
-    assert len(attributes) == len(os.listdir(raster_folder))
+    if len(attributes) != len(os.listdir(raster_folder)):
+        sys.exit("Terrain attributes not generated")
 
     for raster in os.listdir(raster_folder):
         raster_path = os.path.join(raster_folder, raster)
