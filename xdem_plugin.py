@@ -18,8 +18,6 @@
 # limitations under the License.
 
 
-import shutil
-
 from qgis.core import QgsApplication
 
 
@@ -29,18 +27,9 @@ class XdemPlugin:
 
     def initProcessing(self):
         from .xdem_installer import XdemInstaller
-
         installer = XdemInstaller()
-
-        if installer.run():
-            from .xdem_provider import XdemProvider
-
-            self.provider = XdemProvider()
-            QgsApplication.processingRegistry().addProvider(self.provider)
-
-        else:
-            shutil.rmtree(installer.deps_dir)
-            self.unload()
+        self.installer = installer
+        QgsApplication.taskManager().addTask(self.installer)
 
     def initGui(self):
         self.initProcessing()

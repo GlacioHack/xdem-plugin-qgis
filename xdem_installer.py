@@ -18,22 +18,24 @@
 # limitations under the License.
 
 
+import platform
 import importlib
 import os
 import shutil
 import sys
+
+from pathlib import Path
 from importlib.metadata import version
-
-from pip._internal.cli.main import main as pip_main
-from qgis.core import Qgis, QgsMessageLog
+from qgis.core import QgsApplication, QgsTask, Qgis, QgsMessageLog
 
 
-class XdemInstaller:
+class XdemInstaller(QgsTask):
     """
     The xdem python installer
     """
 
     def __init__(self):
+        super().__init__("xDEM Installation", QgsTask.CanCancel)
         self.plugin_dir = os.path.dirname(__file__)
         self.deps_dir = os.path.join(self.plugin_dir, "xdem_dependencies")
 
@@ -68,18 +70,36 @@ class XdemInstaller:
         try:
             importlib.import_module("xdem")
             return True
-        except ModuleNotFoundError as e:
-            self.log(f"xDEM package not found, error: {e}")
-            return False
         except ImportError as e:
-            self.log(f"xDEM found, import error: {e}")
+            self.log(f"xDEM import error: {e}")
             return False
+
+    def python_exec(self):
+        # Conda
+        if (Path(sys.prefix) / "conda-meta").exists():
+            return "python"
+
+        # Windows
+        if platform.system() == "Windows":
+            base_path = Path(sys.prefix)
+            for file in ["python.exe", "python3.exe"]:
+                path = base_path / file
+                if path.is_file():
+                    return str(path)
+
+        # Linux
+        if platform.system() == "Linux":
+            path = sys.executable
+            return path
 
     def install_packages(self):
         """
         Install xdem and its dependencies in the dependencies folder
         """
-        pip_cmd = [
+        cmd = [
+            self.python_exec(),
+            "-um",
+            "pip",
             "install",
             "--target",
             self.deps_dir,
@@ -87,9 +107,10 @@ class XdemInstaller:
             "pypi.org",
             "--trusted-host",
             "files.pythonhosted.org",
-        ] + self.required_packages
+            ] + self.required_packages
 
-        pip_main(pip_cmd)
+        import subprocess
+        subprocess.run(cmd)
 
     def check_version(self):
         if version("xdem") != self.required_xdem_version:
@@ -111,31 +132,26 @@ class XdemInstaller:
         """
         Check if xdem is already installed, if not it proceed with the install
         """
-        # Python version check
-        if sys.version_info < (3, 10):
-            self.log(
-                "Installation failed, python version lower than 3.10",
-                level=Qgis.MessageLevel.Critical,
-            )
-            return False
-
-        # Installing dependencies
         if not os.path.isdir(self.deps_dir):
             os.makedirs(self.deps_dir, exist_ok=True)
             self.install_packages()
 
-        # Add libs folder add the end of the python path
         if self.deps_dir not in sys.path:
             sys.path.append(self.deps_dir)
-            self.set_proj_db()
 
-        if self.xdem_installed():
-            self.log(f"xDEM {self.required_xdem_version} loaded successfully")
+        return True
+
+    def finished(self, result):
+        if result and self.xdem_installed():
             self.check_version()
-            return True
+            self.set_proj_db()
+            self.load_plugin()
+            self.log(f"xDEM {self.required_xdem_version} loaded successfully")
         else:
-            self.log(
-                "Installation failed, unable to import xDEM",
-                level=Qgis.MessageLevel.Critical,
-            )
-            return False
+            self.log("xDEM installation failed")
+            shutil.rmtree(self.deps_dir)
+
+    def load_plugin(self):
+        from .xdem_provider import XdemProvider
+        self.provider = XdemProvider()
+        QgsApplication.processingRegistry().addProvider(self.provider)
