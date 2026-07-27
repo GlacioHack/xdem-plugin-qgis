@@ -17,11 +17,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import inspect
 import os
+import platform
 from typing import Literal, get_args, get_origin, get_type_hints
 
+import matplotlib
 from qgis.core import (
     QgsProcessingAlgorithm,
     QgsProcessingParameterBoolean,
@@ -66,9 +67,13 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
         self.addParameter(parameter)
 
     def prepareAlgorithm(self, parameters, context, feedback):
-        import matplotlib
+        # Specific backend for plotting on Linux
 
-        matplotlib.use("cairo")
+        if platform.system() == "Linux":
+            matplotlib.use("cairo")
+        else:
+            matplotlib.use("agg")
+
         return True
 
     def generate_parameters(self, func):
