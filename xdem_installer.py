@@ -75,22 +75,25 @@ class XdemInstaller(QgsTask):
             return False
 
     def python_exec(self):
-        # Conda
-        if (Path(sys.prefix) / "conda-meta").exists():
-            return "python"
+        # Linux
+        if platform.system() == "Linux":
+            path = sys.executable
+            return path
 
         # Windows
-        if platform.system() == "Windows":
+        elif platform.system() == "Windows":
             base_path = Path(sys.prefix)
             for file in ["python.exe", "python3.exe"]:
                 path = base_path / file
                 if path.is_file():
                     return str(path)
 
-        # Linux
-        if platform.system() == "Linux":
-            path = sys.executable
-            return path
+        # MacOS not yet supported
+        elif platform.system() == "Darwin":
+            return None
+
+    def conda_exec(self):
+        return shutil.which("mamba") or shutil.which("conda")
 
     def install_packages(self):
         """
