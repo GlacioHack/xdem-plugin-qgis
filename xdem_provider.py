@@ -22,10 +22,35 @@ import os
 from qgis.core import QgsProcessingProvider
 from qgis.PyQt.QtGui import QIcon
 
-from .algorithms.coreg import *
-from .algorithms.terrain_attributes import *
-from .algorithms.uncertainty import *
-from .algorithms.workflows import *
+from .algorithms.coreg import (
+    DhMinimizeCoreg,
+    ICPCoreg,
+    LZDCoreg,
+    NuthKaabCoreg,
+    VerticalShiftCoreg,
+    DerampCoreg,
+    DirectionalBiasCoreg,
+    TerrainBiasCoreg,
+)
+from .algorithms.terrain_attributes import (
+    Aspect,
+    FlowlineCurvature,
+    FractalRoughness,
+    Hillshade,
+    MaxCurvature,
+    MinCurvature,
+    PlanformCurvature,
+    ProfileCurvature,
+    Roughness,
+    Rugosity,
+    Slope,
+    TangentialCurvature,
+    TerrainRuggednessIndex,
+    TextureShading,
+    TopographicPositionIndex
+    )
+from .algorithms.uncertainty import Heteroscedasticity
+from .algorithms.workflows import AccuracyWorkflow, TopoWorkflow
 
 
 class XdemProvider(QgsProcessingProvider):

@@ -93,9 +93,11 @@ class Coreg(XdemProcessingAlgorithm):
     def processAlgorithm(self, parameters, context, feedback):
         tba_layer = self.parameterAsRasterLayer(parameters, "tba_dem", context)
         ref_layer = self.parameterAsRasterLayer(parameters, "ref_dem", context)
-        inlier_mask_layer = self.parameterAsRasterLayer(parameters, "mask", context)
+        inlier_mask_layer = self.parameterAsRasterLayer(parameters, "mask",
+                                                        context)
         block_size = self.parameterAsInt(parameters, "blocksize", context)
-        output_path = self.parameterAsOutputLayer(parameters, "output", context)
+        output_path = self.parameterAsOutputLayer(parameters, "output",
+                                                  context)
 
         ref_dem = xdem.DEM(ref_layer.source())
         tba_dem = xdem.DEM(tba_layer.source())
@@ -158,7 +160,7 @@ class CPDCoreg(Coreg):
         return CPDCoreg()
 
     def helpUrl(self):
-        return "https://xdem.readthedocs.io/en/stable/coregistration.html#coherent-point-drift"
+        return "https://xdem.readthedocs.io/en/stable/coregistration.html#coherent-point-drift" # noqa
 
 
 class ICPCoreg(Coreg):
@@ -175,7 +177,7 @@ class ICPCoreg(Coreg):
         return ICPCoreg()
 
     def helpUrl(self):
-        return "https://xdem.readthedocs.io/en/stable/coregistration.html#iterative-closest-point"
+        return "https://xdem.readthedocs.io/en/stable/coregistration.html#iterative-closest-point" # noqa
 
 
 class LZDCoreg(Coreg):
@@ -192,7 +194,7 @@ class LZDCoreg(Coreg):
         return LZDCoreg()
 
     def helpUrl(self):
-        return "https://xdem.readthedocs.io/en/stable/coregistration.html#least-z-difference"
+        return "https://xdem.readthedocs.io/en/stable/coregistration.html#least-z-difference" # noqa
 
 
 class DhMinimizeCoreg(Coreg):
@@ -209,7 +211,7 @@ class DhMinimizeCoreg(Coreg):
         return DhMinimizeCoreg()
 
     def helpUrl(self):
-        return "https://xdem.readthedocs.io/en/stable/coregistration.html#minimization-of-dh"
+        return "https://xdem.readthedocs.io/en/stable/coregistration.html#minimization-of-dh" # noqa
 
 
 class NuthKaabCoreg(Coreg):
@@ -226,7 +228,7 @@ class NuthKaabCoreg(Coreg):
         return NuthKaabCoreg()
 
     def helpUrl(self):
-        return "https://xdem.readthedocs.io/en/stable/coregistration.html#nuth-and-kaab-2011"
+        return "https://xdem.readthedocs.io/en/stable/coregistration.html#nuth-and-kaab-2011" # noqa
 
 
 class VerticalShiftCoreg(Coreg):
@@ -244,7 +246,7 @@ class VerticalShiftCoreg(Coreg):
 
     def helpUrl(self):
         return (
-            "https://xdem.readthedocs.io/en/stable/coregistration.html#vertical-shift"
+            "https://xdem.readthedocs.io/en/stable/coregistration.html#vertical-shift" # noqa
         )
 
 
@@ -263,7 +265,7 @@ class DerampCoreg(Coreg):
         return DerampCoreg()
 
     def helpUrl(self):
-        return "https://xdem.readthedocs.io/en/stable/biascorr.html#deramping"
+        return "https://xdem.readthedocs.io/en/stable/biascorr.html#deramping" # noqa
 
 
 class DirectionalBiasCoreg(Coreg):
@@ -280,7 +282,7 @@ class DirectionalBiasCoreg(Coreg):
         return DirectionalBiasCoreg()
 
     def helpUrl(self):
-        return "https://xdem.readthedocs.io/en/stable/biascorr.html#directional-biases"
+        return "https://xdem.readthedocs.io/en/stable/biascorr.html#directional-biases" # noqa
 
 
 class TerrainBiasCoreg(Coreg):
@@ -297,4 +299,4 @@ class TerrainBiasCoreg(Coreg):
         return TerrainBiasCoreg()
 
     def helpUrl(self):
-        return "https://xdem.readthedocs.io/en/stable/biascorr.html#terrain-biases"
+        return "https://xdem.readthedocs.io/en/stable/biascorr.html#terrain-biases" # noqa

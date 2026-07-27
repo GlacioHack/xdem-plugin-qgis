@@ -31,7 +31,10 @@ from qgis.core import (
 )
 from qgis.utils import iface
 from xdem.workflows import Accuracy, Topo
-from xdem.workflows.schemas import COREG_METHODS, STATS_METHODS, TERRAIN_ATTRIBUTES
+from xdem.workflows.schemas import (
+    COREG_METHODS,
+    STATS_METHODS,
+    TERRAIN_ATTRIBUTES)
 
 from .base import XdemProcessingAlgorithm
 
@@ -67,7 +70,7 @@ def open_pdf_in_browser(output_folder):
 
 class AccuracyWorkflow(XdemProcessingAlgorithm):
     """
-    This class is designed to perform an accuracy assessment of an elevation dataset
+    This class is designed to perform an accuracy assessment of an elev dataset
     """
 
     def initAlgorithm(self, config=None):
@@ -164,8 +167,10 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
 
     def processAlgorithm(self, parameters, context, feedback):
         # Loading layers from QGIS
-        tba_dem_layer = self.parameterAsRasterLayer(parameters, "tba_dem", context)
-        ref_dem_layer = self.parameterAsRasterLayer(parameters, "ref_dem", context)
+        tba_dem_layer = self.parameterAsRasterLayer(parameters, "tba_dem",
+                                                    context)
+        ref_dem_layer = self.parameterAsRasterLayer(parameters, "ref_dem",
+                                                    context)
 
         # Extracting paths
         tba_dem_path = tba_dem_layer.source()
@@ -231,11 +236,16 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
 
     def shortHelpString(self):
         return (
-            "The accuracy workflow performs an accuracy assessment of an elevation dataset.\n"
-            "This assessment relies on analyzing the elevation differences to a secondary elevation dataset on static surfaces, "
-            "as an error proxy to perform coregistration and bias-correction (systematic errors) and to perform uncertainty quantification (structured random errors).\n"
-            "Two output levels are available, Level 1 corresponds to the basic version, while Level 2 allows you to save rasters and statistics.\n"
-            "Note: The PDF may fail to open if the folder is not saved."
+            "The accuracy workflow performs an accuracy assessment of an"
+            "elevation dataset.\nThis assessment relies on analyzing the"
+            "elevation differences to a secondary elevation dataset on "
+            "static surfaces, as an error proxy to perform coregistration"
+            "and bias-correction (systematic errors) and to perform"
+            "uncertainty quantification (structured random errors).\n"
+            "Two output levels are available, Level 1 corresponds to"
+            "the basic version, while Level 2 allows you to save"
+            "rasters and statistics.\nNote: The PDF may fail to"
+            "open if the folder is not saved."
         )
 
     def createInstance(self):
@@ -244,7 +254,7 @@ class AccuracyWorkflow(XdemProcessingAlgorithm):
 
 class TopoWorkflow(XdemProcessingAlgorithm):
     """
-    This class is designed to perform a topographical summary of an elevation dataset
+    This class is designed to perform a topo summary of an elev dataset
     """
 
     def initAlgorithm(self, config=None):
@@ -260,7 +270,10 @@ class TopoWorkflow(XdemProcessingAlgorithm):
                 name="attributes",
                 description="Terrain attributes",
                 options=TERRAIN_ATTRIBUTES,
-                defaultValue=["slope", "aspect", "hillshade", "profile_curvature"],
+                defaultValue=["slope",
+                              "aspect",
+                              "hillshade",
+                              "profile_curvature"],
                 allowMultiple=True,
                 usesStaticStrings=True,
             )
@@ -316,7 +329,8 @@ class TopoWorkflow(XdemProcessingAlgorithm):
         # Extracting paths
         dem_path = dem_layer.source()
 
-        attributes = self.parameterAsEnumStrings(parameters, "attributes", context)
+        attributes = self.parameterAsEnumStrings(parameters, "attributes",
+                                                 context)
         stats = self.parameterAsEnumStrings(parameters, "stats", context)
         level = self.parameterAsInt(parameters, "level", context)
         add_layers = self.parameterAsBoolean(parameters, "add_layers", context)
@@ -365,10 +379,13 @@ class TopoWorkflow(XdemProcessingAlgorithm):
 
     def shortHelpString(self):
         return (
-            "The topo workflow performs a topographical summary of an elevation dataset.\n"
-            "This summary derives a series of terrain attributes (e.g. slope, hillshade, aspect, etc.) "
+            "The topo workflow performs a topographical summary of an"
+            "elevation dataset.\nThis summary derives a series of "
+            "terrain attributes (e.g. slope, hillshade, aspect, etc.) "
             "with statistics (e.g. mean, max, min, etc.).\n"
-            "Two output levels are available, Level 1 corresponds to the basic version, while Level 2 allows you to save rasters and statistics.\n"
+            "Two output levels are available, Level 1 corresponds to the "
+            "basic version, while Level 2 allows you to save rasters"
+            "and statistics.\n"
             "Note: The PDF may fail to open if the folder is not saved."
         )
 

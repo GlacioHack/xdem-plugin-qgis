@@ -30,7 +30,8 @@ from .base import XdemProcessingAlgorithm
 
 class Heteroscedasticity(XdemProcessingAlgorithm):
     """
-    This class is designed to model Heteroscedasticity using terrain slope and maximum curvature as explanatory variables,
+    This class is designed to model Heteroscedasticity using terrain slope
+    and maximum curvature as explanatory variables,
     and with stable terrain as an error proxy for moving terrain
     """
 
@@ -66,10 +67,14 @@ class Heteroscedasticity(XdemProcessingAlgorithm):
 
     def processAlgorithm(self, parameters, context, feedback):
         # Loading layers from QGIS
-        al_dem_layer = self.parameterAsRasterLayer(parameters, "al_dem", context)
-        ref_dem_layer = self.parameterAsRasterLayer(parameters, "ref_dem", context)
-        stable_terrain_layer = self.parameterAsRasterLayer(parameters, "mask", context)
-        output_path = self.parameterAsOutputLayer(parameters, "output", context)
+        al_dem_layer = self.parameterAsRasterLayer(parameters, "al_dem",
+                                                   context)
+        ref_dem_layer = self.parameterAsRasterLayer(parameters, "ref_dem",
+                                                    context)
+        stable_terrain_layer = self.parameterAsRasterLayer(parameters, "mask",
+                                                           context)
+        output_path = self.parameterAsOutputLayer(parameters, "output",
+                                                  context)
 
         aligned_dem = xdem.DEM(al_dem_layer.source())
         ref_dem = xdem.DEM(ref_dem_layer.source())
@@ -95,10 +100,8 @@ class Heteroscedasticity(XdemProcessingAlgorithm):
 
         for slope, maxc in [(0, 0), (40, 0), (0, 5), (40, 5)]:
             feedback.pushInfo(
-                "Error for a slope of {:.0f} degrees and"
-                " {:.2f} m-1 max. curvature: {:.1f} m".format(
-                    slope, maxc / 100, error_function((slope, maxc))
-                )
+                f"Error for a slope of {slope:.0f} degrees and"
+                f" {maxc / 100:.2f} m-1 max. curvature: {error_function((slope, maxc)):.1f} m" # noqa
             )
 
         return {"output": output_path}
@@ -111,15 +114,20 @@ class Heteroscedasticity(XdemProcessingAlgorithm):
 
     def helpUrl(self):
         return (
-            "https://xdem.readthedocs.io/en/stable/uncertainty.html#heteroscedasticity"
+            "https://xdem.readthedocs.io/en/stable/uncertainty.html#heteroscedasticity" # noqa
         )
 
     def shortHelpString(self):
         return (
-            "Digital elevation models have a precision that can vary with terrain and instrument-related variables.\n"
-            "Heteroscedasticity occurs when the variance of the errors is not constant across all values of the explanatory variables.\n"
-            "This algorithm relies on a framework of non-stationary spatial statistics to estimate and model this variability in elevation error, "
-            "using terrain slope and maximum curvature as explanatory variables, with stable terrain as an error proxy for moving terrain."
+            "Digital elevation models have a precision that can vary"
+            "with terrain and instrument-related variables.\n"
+            "Heteroscedasticity occurs when the variance of the errors is"
+            "not constant across all values of the explanatory variables.\n"
+            "This algorithm relies on a framework of non-stationary spatial"
+            "statistics to estimate and model this variability "
+            "in elevation error, using terrain slope and maximum curvature "
+            "as explanatory variables, with stable terrain as"
+            " an error proxy for moving terrain."
         )
 
     def createInstance(self):

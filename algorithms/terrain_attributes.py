@@ -53,7 +53,8 @@ class TerrainAttributes(XdemProcessingAlgorithm):
 
     def processAlgorithm(self, parameters, context, feedback):
         dem_layer = self.parameterAsRasterLayer(parameters, "dem", context)
-        output_path = self.parameterAsOutputLayer(parameters, "output", context)
+        output_path = self.parameterAsOutputLayer(parameters, "output",
+                                                  context)
 
         dem = xdem.DEM(dem_layer.source())
 
@@ -127,7 +128,7 @@ class TopographicPositionIndex(TerrainAttributes):
         return TopographicPositionIndex()
 
     def helpUrl(self):
-        return "https://xdem.readthedocs.io/en/stable/terrain.html#topographic-position-index"
+        return "https://xdem.readthedocs.io/en/stable/terrain.html#topographic-position-index" # noqa
 
 
 class TerrainRuggednessIndex(TerrainAttributes):
@@ -141,7 +142,7 @@ class TerrainRuggednessIndex(TerrainAttributes):
         return TerrainRuggednessIndex()
 
     def helpUrl(self):
-        return "https://xdem.readthedocs.io/en/stable/terrain.html#terrain-ruggedness-index"
+        return "https://xdem.readthedocs.io/en/stable/terrain.html#terrain-ruggedness-index" # noqa
 
 
 class Roughness(TerrainAttributes):
@@ -183,7 +184,7 @@ class FractalRoughness(TerrainAttributes):
         return FractalRoughness()
 
     def helpUrl(self):
-        return "https://xdem.readthedocs.io/en/stable/terrain.html#fractal-roughness"
+        return "https://xdem.readthedocs.io/en/stable/terrain.html#fractal-roughness" # noqa
 
 
 class TextureShading(TerrainAttributes):
@@ -197,7 +198,7 @@ class TextureShading(TerrainAttributes):
         return TextureShading()
 
     def helpUrl(self):
-        return "https://xdem.readthedocs.io/en/stable/terrain.html#texture-shading"
+        return "https://xdem.readthedocs.io/en/stable/terrain.html#texture-shading" # noqa
 
 
 class TangentialCurvature(TerrainAttributes):
@@ -211,7 +212,7 @@ class TangentialCurvature(TerrainAttributes):
         return TangentialCurvature()
 
     def helpUrl(self):
-        return "https://xdem.readthedocs.io/en/stable/terrain.html#tangential-curvature"
+        return "https://xdem.readthedocs.io/en/stable/terrain.html#tangential-curvature" # noqa
 
 
 class PlanformCurvature(TerrainAttributes):
@@ -225,7 +226,7 @@ class PlanformCurvature(TerrainAttributes):
         return PlanformCurvature()
 
     def helpUrl(self):
-        return "https://xdem.readthedocs.io/en/stable/terrain.html#planform-curvature"
+        return "https://xdem.readthedocs.io/en/stable/terrain.html#planform-curvature" # noqa
 
 
 class ProfileCurvature(TerrainAttributes):
@@ -239,7 +240,7 @@ class ProfileCurvature(TerrainAttributes):
         return ProfileCurvature()
 
     def helpUrl(self):
-        return "https://xdem.readthedocs.io/en/stable/terrain.html#profile-curvature"
+        return "https://xdem.readthedocs.io/en/stable/terrain.html#profile-curvature" # noqa
 
 
 class FlowlineCurvature(TerrainAttributes):
@@ -253,7 +254,7 @@ class FlowlineCurvature(TerrainAttributes):
         return FlowlineCurvature()
 
     def helpUrl(self):
-        return "https://xdem.readthedocs.io/en/stable/terrain.html#flowline-curvature"
+        return "https://xdem.readthedocs.io/en/stable/terrain.html#flowline-curvature" # noqa
 
 
 class MaxCurvature(TerrainAttributes):
@@ -267,7 +268,7 @@ class MaxCurvature(TerrainAttributes):
         return MaxCurvature()
 
     def helpUrl(self):
-        return "https://xdem.readthedocs.io/en/stable/terrain.html#maximal-maximum-curvature"
+        return "https://xdem.readthedocs.io/en/stable/terrain.html#maximal-maximum-curvature" # noqa
 
 
 class MinCurvature(TerrainAttributes):
@@ -281,4 +282,4 @@ class MinCurvature(TerrainAttributes):
         return MinCurvature()
 
     def helpUrl(self):
-        return "https://xdem.readthedocs.io/en/stable/terrain.html#minimal-minimum-curvature"
+        return "https://xdem.readthedocs.io/en/stable/terrain.html#minimal-minimum-curvature" # noqa

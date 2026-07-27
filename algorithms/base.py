@@ -17,6 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 import inspect
 import os
 import platform
@@ -40,7 +41,7 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
     """
 
     def flags(self):
-        # Algorithms are not thread safe so multithreading is disabled to prevent crash
+        # Algorithms are not thread safe so multithreading is disabled
         return super().flags() | QgsProcessingAlgorithm.FlagNoThreading
 
     def displayName(self):
@@ -78,7 +79,8 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
 
     def generate_parameters(self, func):
         """
-        Scans the specified function and generate the parameters in QGIS based on their type
+        Scans the specified function and generate the parameters in QGIS
+        based on their type
         """
         # Function signature
         function_signature = inspect.signature(func)
@@ -132,7 +134,8 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
 
     def get_kwargs(self, func, parameters, context):
         """
-        Scans the specified function and convert all arguments entered into QGIS
+        Scans the specified function and convert all arguments
+        entered into QGIS
         """
         # Function signature
         function_signature = inspect.signature(func)
@@ -152,13 +155,15 @@ class XdemProcessingAlgorithm(QgsProcessingAlgorithm):
                 continue
 
             elif param_type is bool:
-                kwargs[name] = self.parameterAsBoolean(parameters, name, context)
+                kwargs[name] = self.parameterAsBoolean(parameters, name,
+                                                       context)
 
             elif param_type is int:
                 kwargs[name] = self.parameterAsInt(parameters, name, context)
 
             elif param_type is float:
-                kwargs[name] = self.parameterAsDouble(parameters, name, context)
+                kwargs[name] = self.parameterAsDouble(parameters, name,
+                                                      context)
 
             elif get_origin(param_type) is Literal:
                 options = list(get_args(param_type))
