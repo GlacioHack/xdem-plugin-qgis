@@ -88,9 +88,18 @@ class XdemInstaller(QgsTask):
                 if path.is_file():
                     return str(path)
 
-        # MacOS
+        # MacOS (test)
         elif platform.system() == "Darwin":
-            return None
+            base_paths = [
+                Path(sys.prefix),
+                Path(sys.prefix) / "bin",
+                Path(sys.executable).parent,
+            ]
+            for base_path in base_paths:
+                for file in ["python", "python3"]:
+                    path = base_path / file
+                    if path.is_file():
+                        return str(path)
 
     def install_packages(self):
         """
