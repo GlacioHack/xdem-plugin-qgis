@@ -21,7 +21,7 @@
 from qgis.core import QgsApplication
 
 
-class XdemPlugin:
+class XdemPlugin():
     def __init__(self):
         self.provider = None
 
@@ -35,4 +35,4 @@ class XdemPlugin:
         self.initProcessing()
 
     def unload(self):
-        QgsApplication.processingRegistry().removeProvider(self.provider)
+        QgsApplication.processingRegistry().removeProvider(self.installer.provider)

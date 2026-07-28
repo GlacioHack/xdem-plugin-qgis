@@ -28,7 +28,6 @@ from pathlib import Path
 from importlib.metadata import version
 from qgis.core import QgsApplication, QgsTask, Qgis, QgsMessageLog
 
-
 class XdemInstaller(QgsTask):
     """
     The xdem python installer
@@ -88,17 +87,15 @@ class XdemInstaller(QgsTask):
                 if path.is_file():
                     return str(path)
 
-        # MacOS not yet supported
+        # MacOS 
         elif platform.system() == "Darwin":
             return None
-
-    def conda_exec(self):
-        return shutil.which("mamba") or shutil.which("conda")
 
     def install_packages(self):
         """
         Install xdem and its dependencies in the dependencies folder
         """
+
         cmd = [
             self.python_exec(),
             "-um",
@@ -128,7 +125,6 @@ class XdemInstaller(QgsTask):
         for root, dirs, files in os.walk(self.deps_dir):
             if "rasterio" in root and "proj.db" in files:
                 os.environ["PROJ_DATA"] = root
-                self.log("Geoutils PROJ_DATA initialized")
                 break
 
     def run(self):
