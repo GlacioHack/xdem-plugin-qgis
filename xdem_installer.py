@@ -31,11 +31,11 @@ from qgis.core import QgsApplication, QgsTask, Qgis, QgsMessageLog
 
 class XdemInstaller(QgsTask):
     """
-    The xdem python installer
+    The xDEM python installer
     """
 
     def __init__(self):
-        super().__init__("xDEM Installation", QgsTask.CanCancel)
+        super().__init__("Installing xDEM Python dependencies", QgsTask.CanCancel)
         self.plugin_dir = os.path.dirname(__file__)
         self.deps_dir = os.path.join(self.plugin_dir, "xdem_dependencies")
 
@@ -103,7 +103,7 @@ class XdemInstaller(QgsTask):
 
     def install_packages(self):
         """
-        Install xdem and its dependencies in the dependencies folder
+        Install xDEM and its dependencies in the dependencies folder
         """
         cmd = [
             self.python_exec(),
@@ -138,7 +138,7 @@ class XdemInstaller(QgsTask):
 
     def run(self):
         """
-        Check if xdem is already installed, if not it proceed with the install
+        Check if xDEM is already installed, if not it proceed with the install
         """
         if not os.path.isdir(self.deps_dir):
             os.makedirs(self.deps_dir, exist_ok=True)
@@ -156,7 +156,7 @@ class XdemInstaller(QgsTask):
             self.load_plugin()
             self.log(f"xDEM {self.required_xdem_version} loaded successfully")
         else:
-            self.log("xDEM installation failed")
+            self.log("xDEM installation failed", level=Qgis.MessageLevel.Critical)
             shutil.rmtree(self.deps_dir)
 
     def load_plugin(self):
