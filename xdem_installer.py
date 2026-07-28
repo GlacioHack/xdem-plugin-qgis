@@ -88,7 +88,7 @@ class XdemInstaller(QgsTask):
                 if path.is_file():
                     return str(path)
 
-        # MacOS 
+        # MacOS
         elif platform.system() == "Darwin":
             return None
 
@@ -137,13 +137,13 @@ class XdemInstaller(QgsTask):
 
         if self.deps_dir not in sys.path:
             sys.path.append(self.deps_dir)
+            self.set_proj_db()
 
         return True
 
     def finished(self, result):
         if result and self.xdem_installed():
             self.check_version()
-            self.set_proj_db()
             self.load_plugin()
             self.log(f"xDEM {self.required_xdem_version} loaded successfully")
         else:

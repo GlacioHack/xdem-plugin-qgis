@@ -35,4 +35,5 @@ class XdemPlugin():
         self.initProcessing()
 
     def unload(self):
-        QgsApplication.processingRegistry().removeProvider(self.installer.provider)
+        QgsApplication.processingRegistry().removeProvider(
+            self.installer.provider)
