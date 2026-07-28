@@ -28,6 +28,7 @@ from pathlib import Path
 from importlib.metadata import version
 from qgis.core import QgsApplication, QgsTask, Qgis, QgsMessageLog
 
+
 class XdemInstaller(QgsTask):
     """
     The xdem python installer
@@ -95,7 +96,6 @@ class XdemInstaller(QgsTask):
         """
         Install xdem and its dependencies in the dependencies folder
         """
-
         cmd = [
             self.python_exec(),
             "-um",
