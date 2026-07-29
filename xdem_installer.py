@@ -140,23 +140,19 @@ class XdemInstaller(QgsTask):
         # Install
         if not os.path.isdir(self.deps_dir):
             os.makedirs(self.deps_dir, exist_ok=True)
-            result = self.install_packages()
+            self.install_packages()
 
-        # Add to sys path and add geoutils proj db
-        if self.deps_dir not in sys.path:
-            sys.path.append(self.deps_dir)
-            self.set_proj_db()
-
-        if result.returncode == 0:
-            return True
-        else:
-            return False
+        return True
 
     def finished(self, result):
         if result:
             self.load_plugin()
 
     def load_plugin(self):
+        # Add to sys path and set geoutil proj db
+        sys.path.append(self.deps_dir)
+        self.set_proj_db()
+
         if self.xdem_installed():
             self.log(f"xDEM {self.required_xdem_version} loaded successfully")
             from .xdem_provider import XdemProvider
