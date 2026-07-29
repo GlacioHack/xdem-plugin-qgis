@@ -145,13 +145,11 @@ class XdemInstaller(QgsTask):
             self.install_packages()
 
         if self.deps_dir not in sys.path:
-            sys.path.append(self.deps_dir)
             self.set_proj_db()
-
-        if self.xdem_installed():
             self.check_version()
+            sys.path.append(self.deps_dir)
 
-        return True
+        return self.xdem_installed()
 
     def finished(self, result):
         if result:
