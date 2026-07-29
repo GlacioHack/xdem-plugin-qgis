@@ -148,11 +148,13 @@ class XdemInstaller(QgsTask):
             sys.path.append(self.deps_dir)
             self.set_proj_db()
 
+        if self.xdem_installed():
+            self.check_version()
+
         return True
 
     def finished(self, result):
-        if result and self.xdem_installed():
-            self.check_version()
+        if result:
             self.load_plugin()
             self.log(f"xDEM {self.required_xdem_version} loaded successfully")
         else:
