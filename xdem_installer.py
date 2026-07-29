@@ -18,7 +18,6 @@
 # limitations under the License.
 
 
-import subprocess  # nosec B404
 import platform
 import importlib
 import os
@@ -36,10 +35,11 @@ class XdemInstaller(QgsTask):
     """
 
     def __init__(self):
-        super().__init__("Install xDEM dependencies", QgsTask.CanCancel)
+        super().__init__("Installing xDEM Python dependencies",
+                         QgsTask.CanCancel)
         self.plugin_dir = os.path.dirname(__file__)
         self.deps_dir = os.path.join(self.plugin_dir, "xdem_dependencies")
-        self.provider = None
+
         metadata_file = os.path.join(self.plugin_dir, "metadata.txt")
 
         # Cut the plugin version in metadata.txt to get the xDEM version
@@ -119,7 +119,8 @@ class XdemInstaller(QgsTask):
             "files.pythonhosted.org",
             ] + self.required_packages
 
-        subprocess.run(cmd)  # nosec B603
+        import subprocess
+        subprocess.run(cmd)
 
     def check_version(self):
         if version("xdem") != self.required_xdem_version:
@@ -145,14 +146,14 @@ class XdemInstaller(QgsTask):
             self.install_packages()
 
         if self.deps_dir not in sys.path:
-            self.set_proj_db()
-            self.check_version()
             sys.path.append(self.deps_dir)
+            self.set_proj_db()
 
-        return self.xdem_installed()
+        return True
 
     def finished(self, result):
-        if result:
+        if result and self.xdem_installed():
+            self.check_version()
             self.load_plugin()
             self.log(f"xDEM {self.required_xdem_version} loaded successfully")
         else:
