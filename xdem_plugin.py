@@ -27,8 +27,7 @@ class XdemPlugin():
 
     def initProcessing(self):
         from .xdem_installer import XdemInstaller
-        installer = XdemInstaller()
-        self.installer = installer
+        self.installer = XdemInstaller()
         QgsApplication.taskManager().addTask(self.installer)
 
     def initGui(self):

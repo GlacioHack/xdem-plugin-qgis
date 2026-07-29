@@ -18,6 +18,7 @@
 # limitations under the License.
 
 
+import subprocess
 import platform
 import importlib
 import os
@@ -35,23 +36,19 @@ class XdemInstaller(QgsTask):
     """
 
     def __init__(self):
-        super().__init__("Installing xDEM Python dependencies",
-                         QgsTask.CanCancel)
+        super().__init__("Install xDEM dependencies", QgsTask.CanCancel)
         self.plugin_dir = os.path.dirname(__file__)
         self.deps_dir = os.path.join(self.plugin_dir, "xdem_dependencies")
+        self.provider = None
 
         metadata_file = os.path.join(self.plugin_dir, "metadata.txt")
-
-        # Cut the plugin version in metadata.txt to get the xDEM version
         with open(metadata_file, "r") as f:
             for line in f:
                 if line.startswith("version="):
-                    line_splited = line.split("=")
-                    self.required_xdem_version = (line_splited[1])[0:5]
-                    break
+                     self.required_xdem_version = line.split("=")[1][0:5]
 
         self.required_packages = [
-            "scipy<=1.17",  # Force max scipy 1.17 because 1.18 needs numpy >= 2.0 (QGIS runs on numpy 1.26.4) # noqa
+            "scipy<=1.17",  # scipy 1.18 needs numpy >= 2.0, QGIS runs numpy 1.26.4
             "plutoprint",
             "matplotlib",
             "pytest",
@@ -68,43 +65,44 @@ class XdemInstaller(QgsTask):
         QgsMessageLog.logMessage(message, "xDEM", level)
 
     def xdem_installed(self):
-        try:
-            importlib.import_module("xdem")
-            return True
-        except ImportError as e:
-            self.log(f"xDEM import error: {e}")
-            return False
+        return importlib.util.find_spec("xdem") is not None
 
     def python_exec(self):
+        """
+        Return the path of the Python executable
+        """
+        system = platform.system()
+
         # Linux
-        if platform.system() == "Linux":
-            path = sys.executable
-            return path
+        if system == "Linux":
+            return sys.executable
 
         # Windows
-        elif platform.system() == "Windows":
+        if system == "Windows":
             base_path = Path(sys.prefix)
-            for file in ["python.exe", "python3.exe"]:
-                path = base_path / file
+            for name in ("python.exe", "python3.exe"):
+                path = base_path / name
                 if path.is_file():
                     return str(path)
 
-        # MacOS (test)
-        elif platform.system() == "Darwin":
+        # MacOS
+        if system == "Darwin":
             base_paths = [
                 Path(sys.prefix),
                 Path(sys.prefix) / "bin",
                 Path(sys.executable).parent,
             ]
             for base_path in base_paths:
-                for file in ["python", "python3"]:
-                    path = base_path / file
+                for name in ("python", "python3"):
+                    path = base_path / name
                     if path.is_file():
                         return str(path)
 
+        return None
+
     def install_packages(self):
         """
-        Install xDEM and its dependencies in the dependencies folder
+        Install xDEM dependencies
         """
         cmd = [
             self.python_exec(),
@@ -117,9 +115,8 @@ class XdemInstaller(QgsTask):
             "pypi.org",
             "--trusted-host",
             "files.pythonhosted.org",
-            ] + self.required_packages
+        ] + self.required_packages
 
-        import subprocess
         subprocess.run(cmd)
 
     def check_version(self):
@@ -139,8 +136,11 @@ class XdemInstaller(QgsTask):
 
     def run(self):
         """
-        Check if xDEM is already installed, if not it proceed with the install
+        Check if xDEM is already installed, if not proceed with the install.
         """
+        if sys.version_info < (3, 10):
+            return False
+
         if not os.path.isdir(self.deps_dir):
             os.makedirs(self.deps_dir, exist_ok=True)
             self.install_packages()
@@ -152,14 +152,14 @@ class XdemInstaller(QgsTask):
         return True
 
     def finished(self, result):
-        if result and self.xdem_installed():
-            self.check_version()
-            self.load_plugin()
-            self.log(f"xDEM {self.required_xdem_version} loaded successfully")
-        else:
-            self.log("xDEM installation failed",
-                     level=Qgis.MessageLevel.Critical)
+        if not result or not self.xdem_installed():
+            self.log("xDEM installation failed", level=Qgis.MessageLevel.Critical)
             shutil.rmtree(self.deps_dir)
+            return
+
+        # self.check_version()
+        self.load_plugin()
+        self.log(f"xDEM {self.required_xdem_version} loaded successfully")
 
     def load_plugin(self):
         from .xdem_provider import XdemProvider
