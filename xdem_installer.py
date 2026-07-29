@@ -117,7 +117,7 @@ class XdemInstaller(QgsTask):
             "files.pythonhosted.org",
         ] + self.required_packages
 
-        subprocess.run(cmd)
+        return subprocess.run(cmd)
 
     def set_proj_db(self):
         """
@@ -134,29 +134,34 @@ class XdemInstaller(QgsTask):
         """
         # Python version check
         if sys.version_info < (3, 10):
+            self.log("Python version lower than 3.10", level=Qgis.MessageLevel.Critical)
             return False
 
+        # Install
         if not os.path.isdir(self.deps_dir):
             os.makedirs(self.deps_dir, exist_ok=True)
-            self.install_packages()
+            result = self.install_packages()
 
+        # Add to sys path and add geoutils proj db
         if self.deps_dir not in sys.path:
             sys.path.append(self.deps_dir)
             self.set_proj_db()
 
-        return True
+        if result.returncode == 0:
+            return True
+        else:
+            return False
 
     def finished(self, result):
         if result:
-            self.log(f"xDEM {self.required_xdem_version} loaded successfully")
             self.load_plugin()
-        else:
-            self.log("xDEM installation failed", level=Qgis.MessageLevel.Critical)
-            shutil.rmtree(self.deps_dir)
-            return
 
     def load_plugin(self):
         if self.xdem_installed():
+            self.log(f"xDEM {self.required_xdem_version} loaded successfully")
             from .xdem_provider import XdemProvider
             self.provider = XdemProvider()
             QgsApplication.processingRegistry().addProvider(self.provider)
+        else:
+            self.log("xDEM installation failed", level=Qgis.MessageLevel.Critical)
+            shutil.rmtree(self.deps_dir)
