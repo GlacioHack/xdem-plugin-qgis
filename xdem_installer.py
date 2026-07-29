@@ -117,7 +117,12 @@ class XdemInstaller(QgsTask):
             "files.pythonhosted.org",
         ] + self.required_packages
 
-        return subprocess.run(cmd)
+        result = subprocess.run(cmd)
+
+        if result.returncode == 0:
+            return True
+        else:
+            return False
 
     def set_proj_db(self):
         """
@@ -140,19 +145,37 @@ class XdemInstaller(QgsTask):
         # Install
         if not os.path.isdir(self.deps_dir):
             os.makedirs(self.deps_dir, exist_ok=True)
-            self.install_packages()
+
+            cmd = [
+                self.python_exec(),
+                "-um",
+                "pip",
+                "install",
+                "--target",
+                self.deps_dir,
+                "--trusted-host",
+                "pypi.org",
+                "--trusted-host",
+                "files.pythonhosted.org",
+            ] + self.required_packages
+            
+            result = subprocess.run(cmd)
+            
+            if result.returncode == 0:
+                return True
+            else:
+                return False
 
         return True
 
     def finished(self, result):
-        if result:
-            self.load_plugin()
+        if self.status() == QgsTask.Complete:
+            if result:
+                sys.path.append(self.deps_dir)
+                self.set_proj_db()
+                self.load_plugin()
 
     def load_plugin(self):
-        # Add to sys path and set geoutil proj db
-        sys.path.append(self.deps_dir)
-        self.set_proj_db()
-
         if self.xdem_installed():
             self.log(f"xDEM {self.required_xdem_version} loaded successfully")
             from .xdem_provider import XdemProvider
