@@ -136,12 +136,7 @@ class XdemInstaller(QgsTask):
                 "files.pythonhosted.org",
             ] + self.required_packages
 
-            result = subprocess.run(
-                cmd, 
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-                check=False)
+            result = subprocess.run(cmd)
 
             if result.returncode != 0:
                 return False
@@ -151,10 +146,6 @@ class XdemInstaller(QgsTask):
     def finished(self, result):
         if self.status() != QgsTask.Complete:
             return
-
-        if not result:
-            self.log("xDEM installation failed", level=Qgis.MessageLevel.Critical)
-
         sys.path.append(self.deps_dir)
         self.set_proj_db()
         self.load_plugin()

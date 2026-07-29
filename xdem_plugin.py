@@ -23,6 +23,7 @@ from qgis.core import QgsApplication
 
 class XdemPlugin():
     def __init__(self):
+        self.installer = None
         self.provider = None
 
     def initProcessing(self):
