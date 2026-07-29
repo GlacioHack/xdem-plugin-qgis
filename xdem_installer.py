@@ -100,30 +100,6 @@ class XdemInstaller(QgsTask):
 
         return None
 
-    def install_packages(self):
-        """
-        Install xDEM dependencies
-        """
-        cmd = [
-            self.python_exec(),
-            "-um",
-            "pip",
-            "install",
-            "--target",
-            self.deps_dir,
-            "--trusted-host",
-            "pypi.org",
-            "--trusted-host",
-            "files.pythonhosted.org",
-        ] + self.required_packages
-
-        result = subprocess.run(cmd)
-
-        if result.returncode == 0:
-            return True
-        else:
-            return False
-
     def set_proj_db(self):
         """
         Search for and set proj database
@@ -139,7 +115,8 @@ class XdemInstaller(QgsTask):
         """
         # Python version check
         if sys.version_info < (3, 10):
-            self.log("Python version lower than 3.10", level=Qgis.MessageLevel.Critical)
+            self.log("Python version lower than 3.10",
+                     level=Qgis.MessageLevel.Critical)
             return False
 
         # Install
@@ -158,22 +135,29 @@ class XdemInstaller(QgsTask):
                 "--trusted-host",
                 "files.pythonhosted.org",
             ] + self.required_packages
-            
-            result = subprocess.run(cmd)
-            
-            if result.returncode == 0:
-                return True
-            else:
+
+            result = subprocess.run(
+                cmd, 
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                check=False)
+
+            if result.returncode != 0:
                 return False
 
         return True
 
     def finished(self, result):
-        if self.status() == QgsTask.Complete:
-            if result:
-                sys.path.append(self.deps_dir)
-                self.set_proj_db()
-                self.load_plugin()
+        if self.status() != QgsTask.Complete:
+            return
+
+        if not result:
+            self.log("xDEM installation failed", level=Qgis.MessageLevel.Critical)
+
+        sys.path.append(self.deps_dir)
+        self.set_proj_db()
+        self.load_plugin()
 
     def load_plugin(self):
         if self.xdem_installed():
