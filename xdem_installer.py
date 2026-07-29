@@ -18,16 +18,9 @@
 # limitations under the License.
 
 
-import subprocess
-import platform
-import importlib
 import os
-import shutil
-import sys
-
-from pathlib import Path
-from importlib.metadata import version
-from qgis.core import QgsApplication, QgsTask, Qgis, QgsMessageLog
+from pip._internal.cli.main import main as pip_main
+from qgis.core import QgsTask
 
 
 class XdemInstaller(QgsTask):
@@ -35,17 +28,11 @@ class XdemInstaller(QgsTask):
     The xDEM python installer
     """
 
-    def __init__(self):
-        super().__init__("Install xDEM dependencies", QgsTask.CanCancel)
-        self.plugin_dir = os.path.dirname(__file__)
-        self.deps_dir = os.path.join(self.plugin_dir, "xdem_dependencies")
-        self.provider = None
+    def __init__(self, target_dir, xdem_version):
+        super().__init__("xDEM Installation", QgsTask.CanCancel)
 
-        metadata_file = os.path.join(self.plugin_dir, "metadata.txt")
-        with open(metadata_file, "r") as f:
-            for line in f:
-                if line.startswith("version="):
-                     self.required_xdem_version = line.split("=")[1][0:5]
+        self.target_dir = target_dir
+        self.xdem_version = xdem_version
 
         self.required_packages = [
             "scipy<=1.17",  # scipy 1.18 needs numpy >= 2.0, QGIS runs numpy 1.26.4
@@ -55,105 +42,23 @@ class XdemInstaller(QgsTask):
             "cairocffi",  # Matplotlib-specific backend
             "cerberus",
             "scikit-learn",
-            f"xdem=={self.required_xdem_version}",
+            f"xdem=={self.xdem_version}",
         ]
 
-    def log(self, message, level=Qgis.MessageLevel.Info):
-        """
-        Displays information in the QGIS console, in the xDEM section
-        """
-        QgsMessageLog.logMessage(message, "xDEM", level)
-
-    def xdem_installed(self):
-        return importlib.util.find_spec("xdem") is not None
-
-    def python_exec(self):
-        """
-        Return the path of the Python executable
-        """
-        system = platform.system()
-
-        # Linux
-        if system == "Linux":
-            return sys.executable
-
-        # Windows
-        if system == "Windows":
-            base_path = Path(sys.prefix)
-            for name in ("python.exe", "python3.exe"):
-                path = base_path / name
-                if path.is_file():
-                    return str(path)
-
-        # MacOS
-        if system == "Darwin":
-            base_paths = [
-                Path(sys.prefix),
-                Path(sys.prefix) / "bin",
-                Path(sys.executable).parent,
-            ]
-            for base_path in base_paths:
-                for name in ("python", "python3"):
-                    path = base_path / name
-                    if path.is_file():
-                        return str(path)
-
-        return None
-
-    def set_proj_db(self):
-        """
-        Search for and set proj database
-        """
-        for root, dirs, files in os.walk(self.deps_dir):
-            if "rasterio" in root and "proj.db" in files:
-                os.environ["PROJ_DATA"] = root
-                break
-
     def run(self):
-        """
-        Check if xDEM is already installed, if not proceed with the install.
-        """
-        # Python version check
-        if sys.version_info < (3, 10):
-            self.log("Python version lower than 3.10",
-                     level=Qgis.MessageLevel.Critical)
-            return False
-
-        # Install
-        if not os.path.isdir(self.deps_dir):
-            os.makedirs(self.deps_dir, exist_ok=True)
+        if not os.path.isdir(self.target_dir):
+            os.makedirs(self.target_dir, exist_ok=True)
 
             cmd = [
-                self.python_exec(),
-                "-um",
-                "pip",
                 "install",
                 "--target",
-                self.deps_dir,
+                self.target_dir,
                 "--trusted-host",
                 "pypi.org",
                 "--trusted-host",
                 "files.pythonhosted.org",
             ] + self.required_packages
 
-            result = subprocess.run(cmd)
-
-            if result.returncode != 0:
-                return False
+            pip_main(cmd)
 
         return True
-
-    def finished(self, result):
-        if self.status() != QgsTask.Complete:
-            if result:
-                sys.path.append(self.deps_dir)
-                self.set_proj_db()
-                self.load_plugin()
-
-
-    def load_plugin(self):
-        if self.xdem_installed():
-            self.log(f"xDEM {self.required_xdem_version} loaded successfully")
-            from .xdem_provider import XdemProvider
-            self.provider = XdemProvider()
-            QgsApplication.processingRegistry().addProvider(self.provider)
