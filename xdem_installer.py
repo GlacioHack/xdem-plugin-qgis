@@ -35,7 +35,7 @@ class XdemInstaller(QgsTask):
     """
 
     def __init__(self):
-        super().__init__("Installing xDEM Python dependencies", QgsTask.CanCancel)
+        super().__init__("Install xDEM dependencies", QgsTask.CanCancel)
         self.plugin_dir = os.path.dirname(__file__)
         self.deps_dir = os.path.join(self.plugin_dir, "xdem_dependencies")
 
