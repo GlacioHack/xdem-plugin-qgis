@@ -145,10 +145,11 @@ class XdemInstaller(QgsTask):
 
     def finished(self, result):
         if self.status() != QgsTask.Complete:
-            return
-        sys.path.append(self.deps_dir)
-        self.set_proj_db()
-        self.load_plugin()
+            if result:
+                sys.path.append(self.deps_dir)
+                self.set_proj_db()
+                self.load_plugin()
+
 
     def load_plugin(self):
         if self.xdem_installed():
@@ -156,6 +157,3 @@ class XdemInstaller(QgsTask):
             from .xdem_provider import XdemProvider
             self.provider = XdemProvider()
             QgsApplication.processingRegistry().addProvider(self.provider)
-        else:
-            self.log("xDEM installation failed", level=Qgis.MessageLevel.Critical)
-            shutil.rmtree(self.deps_dir)
