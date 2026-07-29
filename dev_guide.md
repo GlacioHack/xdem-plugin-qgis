@@ -46,6 +46,9 @@ It will take a few minutes for the dependencies to install properly, do not forc
 
 A plugin that will be very helpful during development is [Plugin Reloader](https://plugins.qgis.org/plugins/plugin_reloader/). By default, when changes are made to the plugin code, QGIS must be restarted. This extension allows plugins to be refreshed without closing the software.
 
+## Pre-commit
+In order for the plugin's code to be published, it must comply with certain standards, which are available on the [QGIS plugins security page](https://plugins.qgis.org/docs/security-scanning/tools).
+
 ## Version
 The plugin version consists of four digits, the first three represent the compatible xDEM version, and the last digit represents the plugin version.
 For example, if the plugin is version `0.2.3.1`, it works with xDEM `0.2.3`. To ensure compatibility, a version check is performed at each QGIS startup.
