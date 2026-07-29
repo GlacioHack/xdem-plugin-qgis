@@ -119,12 +119,6 @@ class XdemInstaller(QgsTask):
 
         subprocess.run(cmd)
 
-    def check_version(self):
-        if version("xdem") != self.required_xdem_version:
-            self.log(f"Update to xDEM {self.required_xdem_version}")
-            shutil.rmtree(self.deps_dir)
-            self.run()
-
     def set_proj_db(self):
         """
         Search for and set proj database
@@ -138,6 +132,7 @@ class XdemInstaller(QgsTask):
         """
         Check if xDEM is already installed, if not proceed with the install.
         """
+        # Python version check
         if sys.version_info < (3, 10):
             return False
 
@@ -152,16 +147,16 @@ class XdemInstaller(QgsTask):
         return True
 
     def finished(self, result):
-        if not result or not self.xdem_installed():
+        if result:
+            self.log(f"xDEM {self.required_xdem_version} loaded successfully")
+            self.load_plugin()
+        else:
             self.log("xDEM installation failed", level=Qgis.MessageLevel.Critical)
             shutil.rmtree(self.deps_dir)
             return
 
-        # self.check_version()
-        self.load_plugin()
-        self.log(f"xDEM {self.required_xdem_version} loaded successfully")
-
     def load_plugin(self):
-        from .xdem_provider import XdemProvider
-        self.provider = XdemProvider()
-        QgsApplication.processingRegistry().addProvider(self.provider)
+        if self.xdem_installed():
+            from .xdem_provider import XdemProvider
+            self.provider = XdemProvider()
+            QgsApplication.processingRegistry().addProvider(self.provider)
