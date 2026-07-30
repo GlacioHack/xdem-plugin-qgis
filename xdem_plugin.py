@@ -29,6 +29,12 @@ from qgis.core import QgsApplication, Qgis, QgsMessageLog
 
 
 class XdemPlugin():
+    """
+    Startup class for the plugin,
+    used for initializing the QGIS environment,
+    when xDEM is installed correctly, it starts the provider
+    """
+
     def __init__(self, iface):
         self.installer = None
         self.provider = None

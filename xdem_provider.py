@@ -54,6 +54,12 @@ from .algorithms.workflows import AccuracyWorkflow, TopoWorkflow
 
 
 class XdemProvider(QgsProcessingProvider):
+    """
+    The Algorithm Provider,
+    responsible for finding all the plugin's algorithms
+    and adding them to the interface
+    """
+
     def __init__(self):
         QgsProcessingProvider.__init__(self)
 
