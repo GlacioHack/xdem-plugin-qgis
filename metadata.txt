@@ -6,9 +6,9 @@ about=
 
     Python dependencies are installed automatically the first time the plugin runs. The installation may take a few minutes, please do not close QGIS during this process.
 
-changelog=This new version improves the installation process. QGIS can now remain accessible while xDEM's Python dependencies are being installed.
+changelog=This new version improves the installation process, and adds messages to the QGIS interface.
 
-version=0.2.3.3
+version=0.2.3.4
 qgisMinimumVersion=3.28
 qgisMaximumVersion=4.9
 
