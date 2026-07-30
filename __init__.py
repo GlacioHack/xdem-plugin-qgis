@@ -21,4 +21,4 @@
 def classFactory(iface):
     from .xdem_plugin import XdemPlugin
 
-    return XdemPlugin()
+    return XdemPlugin(iface)

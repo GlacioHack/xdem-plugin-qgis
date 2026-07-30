@@ -21,13 +21,19 @@
 import os
 import sys
 import importlib
-from qgis.core import QgsApplication, QgsTask, Qgis, QgsMessageLog
+import shutil
+import platform
+
+from pathlib import Path
+from qgis.core import QgsApplication, Qgis, QgsMessageLog
 
 
 class XdemPlugin():
-    def __init__(self):
+    def __init__(self, iface):
         self.installer = None
         self.provider = None
+        self.iface = iface
+        self.python_path = self.get_python_path()
         self.plugin_dir = os.path.dirname(__file__)
         self.deps_dir = os.path.join(self.plugin_dir, "xdem_dependencies")
 
@@ -35,7 +41,7 @@ class XdemPlugin():
         with open(metadata_file, "r") as f:
             for line in f:
                 if line.startswith("version="):
-                        self.xdem_version = line.split("=")[1][0:5]
+                    self.xdem_version = line.split("=")[1][0:5]
 
     def initGui(self):
         self.initProcessing()
@@ -43,28 +49,47 @@ class XdemPlugin():
     def initProcessing(self):
         # Python version check
         if sys.version_info < (3, 10):
-            self.log("Python version lower than 3.10")
+            self.log("Python version lower than 3.10",
+                     level=Qgis.MessageLevel.Critical)
+            self.unload()
             return
 
-        from .xdem_installer import XdemInstaller
-        self.installer = XdemInstaller(target_dir=self.deps_dir, xdem_version=self.xdem_version)
+        if not os.path.isdir(self.deps_dir):
+            self.iface.messageBar().pushMessage(
+                "xDEM installation in progress", level=Qgis.Info)
 
-        self.installer.taskCompleted.connect(self.load)
-        self.installer.taskTerminated.connect(self.unload)
+            from .xdem_installer import XdemInstaller
 
-        QgsApplication.taskManager().addTask(self.installer)
+            self.installer = XdemInstaller(target_dir=self.deps_dir,
+                                           python_path=self.python_path,
+                                           xdem_version=self.xdem_version)
 
-    def load(self):
+            self.installer.taskCompleted.connect(self.install_complete)
+            self.installer.taskTerminated.connect(self.install_failled)
+
+            QgsApplication.taskManager().addTask(self.installer)
+
+        else:
+            self.install_complete()
+
+    def install_complete(self):
         sys.path.append(self.deps_dir)
         self.set_proj_db()
         if self.xdem_installed():
-            self.log(f"xDEM {self.xdem_version} successfully loaded")
-            from .xdem_provider import XdemProvider
-            self.provider = XdemProvider()
-            QgsApplication.processingRegistry().addProvider(self.provider)
+            self.load()
         else:
-            self.log("Unable to import xDEM after installation", level=Qgis.MessageLevel.Critical)
-            self.unload()
+            self.install_failled()
+
+    def install_failled(self):
+        self.log("Installation failed", level=Qgis.MessageLevel.Critical)
+        shutil.rmtree(self.deps_dir)
+        self.unload()
+
+    def load(self):
+        from .xdem_provider import XdemProvider
+        self.provider = XdemProvider()
+        QgsApplication.processingRegistry().addProvider(self.provider)
+        self.log(f"xDEM {self.xdem_version} successfully loaded")
 
     def unload(self):
         QgsApplication.processingRegistry().removeProvider(self.provider)
@@ -77,7 +102,7 @@ class XdemPlugin():
 
     def xdem_installed(self):
         return importlib.util.find_spec("xdem") is not None
-    
+
     def set_proj_db(self):
         """
         Search for and set geoutils proj database
@@ -86,3 +111,34 @@ class XdemPlugin():
             if "rasterio" in root and "proj.db" in files:
                 os.environ["PROJ_DATA"] = root
                 break
+
+    def get_python_path(self):
+        """
+        Return the path of the Python executable
+        """
+        system = platform.system()
+
+        # Linux
+        if system == "Linux":
+            return sys.executable
+
+        # Windows
+        elif system == "Windows":
+            base_path = Path(sys.prefix)
+            for name in ("python.exe", "python3.exe"):
+                path = base_path / name
+                if path.is_file():
+                    return str(path)
+
+        # MacOS
+        elif system == "Darwin":
+            base_paths = [
+                Path(sys.prefix),
+                Path(sys.prefix) / "bin",
+                Path(sys.executable).parent,
+            ]
+            for base_path in base_paths:
+                for name in ("python", "python3"):
+                    path = base_path / name
+                    if path.is_file():
+                        return str(path)

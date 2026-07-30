@@ -19,7 +19,8 @@
 
 
 import os
-from pip._internal.cli.main import main as pip_main
+import subprocess
+
 from qgis.core import QgsTask
 
 
@@ -28,14 +29,15 @@ class XdemInstaller(QgsTask):
     The xDEM python installer
     """
 
-    def __init__(self, target_dir, xdem_version):
-        super().__init__("xDEM Installation", QgsTask.CanCancel)
+    def __init__(self, target_dir, python_path, xdem_version):
+        super().__init__("xDEM installation", QgsTask.CanCancel)
 
         self.target_dir = target_dir
+        self.python_path = python_path
         self.xdem_version = xdem_version
 
         self.required_packages = [
-            "scipy<=1.17",  # scipy 1.18 needs numpy >= 2.0, QGIS runs numpy 1.26.4
+            "scipy<=1.17",  # scipy 1.18 needs numpy >= 2.0, QGIS runs numpy 1.26.4 # noqa
             "plutoprint",
             "matplotlib",
             "pytest",
@@ -46,19 +48,21 @@ class XdemInstaller(QgsTask):
         ]
 
     def run(self):
-        if not os.path.isdir(self.target_dir):
-            os.makedirs(self.target_dir, exist_ok=True)
+        os.makedirs(self.target_dir, exist_ok=True)
 
-            cmd = [
-                "install",
-                "--target",
-                self.target_dir,
-                "--trusted-host",
-                "pypi.org",
-                "--trusted-host",
-                "files.pythonhosted.org",
-            ] + self.required_packages
+        cmd = [
+            self.python_path,
+            "-um",
+            "pip",
+            "install",
+            "--target",
+            self.target_dir,
+            "--trusted-host",
+            "pypi.org",
+            "--trusted-host",
+            "files.pythonhosted.org",
+        ] + self.required_packages
 
-            pip_main(cmd)
+        subprocess.run(cmd)
 
         return True
