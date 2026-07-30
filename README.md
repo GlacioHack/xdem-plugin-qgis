@@ -28,6 +28,6 @@ All the algorithms can be accessed through the QGIS Processing Toolbox in `xDEM`
 - [xDEM](https://xdem.readthedocs.io/en/stable/index.html)
 - [Developer guide](dev_guide.md)
 
-## Autors
+## Authors
 The original contribution was created by Antoine Ould [ould-a](https://github.com/ould-a),
 the [xDEM developers](https://github.com/GlacioHack/xdem/blob/main/AUTHORS.md) also contributed to the development of the plugin.
