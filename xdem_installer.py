@@ -63,6 +63,6 @@ class XdemInstaller(QgsTask):
             "files.pythonhosted.org",
         ] + self.required_packages
 
-        subprocess.run(cmd)  # nosed B603
+        subprocess.run(cmd)  # nosec B603
 
         return True
