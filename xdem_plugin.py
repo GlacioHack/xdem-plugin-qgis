@@ -55,14 +55,23 @@ class XdemPlugin():
     def initProcessing(self):
         # Python version check
         if sys.version_info < (3, 10):
-            self.log("Python version lower than 3.10",
+            self.log("QGIS Python version lower than 3.10",
                      level=Qgis.MessageLevel.Critical)
-            self.unload()
+            self.install_failed()
+            return
+
+        # Check for Python executable
+        if not self.python_path:
+            self.log("Unable to locate the Python executable",
+                     level=Qgis.MessageLevel.Critical)
+            self.install_failed()
             return
 
         if not os.path.isdir(self.deps_dir):
             self.iface.messageBar().pushMessage(
                 "xDEM installation in progress", level=Qgis.Info)
+
+            self.log(f"Installation in progress using {self.python_path}")
 
             from .xdem_installer import XdemInstaller
 
@@ -70,32 +79,40 @@ class XdemPlugin():
                                            python_path=self.python_path,
                                            xdem_version=self.xdem_version)
 
-            self.installer.taskCompleted.connect(self.install_complete)
-            self.installer.taskTerminated.connect(self.install_failled)
+            self.installer.taskCompleted.connect(self.load)
+            self.installer.taskTerminated.connect(self.install_failed)
 
             QgsApplication.taskManager().addTask(self.installer)
 
         else:
-            self.install_complete()
-
-    def install_complete(self):
-        sys.path.append(self.deps_dir)
-        self.set_proj_db()
-        if self.xdem_installed():
             self.load()
-        else:
-            self.install_failled()
-
-    def install_failled(self):
-        self.log("Installation failed", level=Qgis.MessageLevel.Critical)
-        shutil.rmtree(self.deps_dir)
-        self.unload()
 
     def load(self):
-        from .xdem_provider import XdemProvider
-        self.provider = XdemProvider()
-        QgsApplication.processingRegistry().addProvider(self.provider)
-        self.log(f"xDEM {self.xdem_version} successfully loaded")
+        """
+        Prepare the environment,
+        check if xDEM is well installed and load the provider
+        """
+        # Add dependencies folder to sys path
+        sys.path.append(self.deps_dir)
+
+        self.set_proj_db()
+
+        if self.xdem_installed():
+            from .xdem_provider import XdemProvider
+            self.provider = XdemProvider()
+            QgsApplication.processingRegistry().addProvider(self.provider)
+            self.log(f"xDEM {self.xdem_version} successfully loaded")
+        else:
+            self.log(f"xDEM {self.xdem_version} can be imported")
+            self.install_failed()
+
+    def install_failed(self):
+        """
+        Cleanup and cancel the install
+        """
+        self.log("xDEM installation failed", level=Qgis.MessageLevel.Critical)
+        shutil.rmtree(self.deps_dir)
+        self.unload()
 
     def unload(self):
         QgsApplication.processingRegistry().removeProvider(self.provider)
@@ -148,3 +165,5 @@ class XdemPlugin():
                     path = base_path / name
                     if path.is_file():
                         return str(path)
+
+        return None
