@@ -19,7 +19,7 @@
 
 
 import os
-import subprocess
+import subprocess  # nosec B404
 
 from qgis.core import QgsTask
 
@@ -63,6 +63,6 @@ class XdemInstaller(QgsTask):
             "files.pythonhosted.org",
         ] + self.required_packages
 
-        subprocess.run(cmd)
+        subprocess.run(cmd)  # nosed B603
 
         return True
